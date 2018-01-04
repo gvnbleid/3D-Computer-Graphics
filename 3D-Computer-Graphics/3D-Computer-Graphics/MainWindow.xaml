@@ -5,8 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_3D_Computer_Graphics"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="500" Width="750">
     <Grid>
         
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="175"/>
+        </Grid.ColumnDefinitions>
+        
+        <ListBox Grid.Column="0" Background="Black" Width="100" Height="120" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,5">
+            
+        </ListBox>
+        
+        <Image Name="Screen" Margin="5,0,10,0"/>
+
+        <Grid Grid.Column="1">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="150"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Background="Bisque">
+                
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Background="Beige">
+                <TextBlock TextAlignment="Center" FontWeight="Bold">
+                    Render options
+                </TextBlock>
+                <CheckBox>Draw faces</CheckBox>
+                <CheckBox>Backface culling</CheckBox>
+                <CheckBox>World space transformations</CheckBox>
+                <CheckBox>Draw icons</CheckBox>
+                
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
