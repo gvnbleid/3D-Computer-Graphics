@@ -17,11 +17,11 @@ namespace _3D_Computer_Graphics.Scene
         public Vector Up { get; set; }
         public Matrix View { get; set; }
 
-        public Camera()
+        public Camera(double x, double y, double z)
         {
             Counter++;
             Title = "Camera " + Counter;
-            Position = new Vector(3, new double[] { 0, -100, -100});
+            Position = new Vector(3, new double[] { x, y, z});
             Target = new Vector(3, new double[] { 0, 0, 0 });
             Direction = Position - Target;
             Direction.Normalize();

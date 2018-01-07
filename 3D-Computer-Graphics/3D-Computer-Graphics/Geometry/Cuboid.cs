@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using _3D_Computer_Graphics.Geometry;
 
 namespace _3D_Computer_Graphics.Geometry
 {
@@ -45,6 +55,9 @@ namespace _3D_Computer_Graphics.Geometry
             MProj[2, 3] = -2 * far * near / (far - near);
             MProj[3, 2] = -1;
 
+            Point[] p = new Point[8];
+            int index = 0;
+
             foreach(Vector v in Vertices)
             {
                 Vector vv = view * v;
@@ -61,18 +74,24 @@ namespace _3D_Computer_Graphics.Geometry
 
                 int x = Math.Min(width - 1, (int)((vvv[0] + 1) * 0.5 * width));
                 int y = Math.Max(Math.Min(height - 1, (int)((vvv[1] + 1) * 0.5 * height)),0);
+                p[index++] = new Point(x, y);
                 colorArray[y * stride + x * bytesPerPixel] = 255;
                 colorArray[y * stride + x * bytesPerPixel + 3] = 255;
             }
+            Drawing.DrawLine((int)p[0].X, (int)p[0].Y, (int)p[1].X, (int)p[1].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[0].X, (int)p[0].Y, (int)p[2].X, (int)p[2].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[0].X, (int)p[0].Y, (int)p[3].X, (int)p[3].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[3].X, (int)p[3].Y, (int)p[4].X, (int)p[4].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[3].X, (int)p[3].Y, (int)p[6].X, (int)p[6].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[4].X, (int)p[4].Y, (int)p[7].X, (int)p[7].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[6].X, (int)p[6].Y, (int)p[7].X, (int)p[7].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[1].X, (int)p[1].Y, (int)p[5].X, (int)p[5].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[1].X, (int)p[1].Y, (int)p[6].X, (int)p[6].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[2].X, (int)p[2].Y, (int)p[5].X, (int)p[5].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[2].X, (int)p[2].Y, (int)p[4].X, (int)p[4].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+            Drawing.DrawLine((int)p[5].X, (int)p[5].Y, (int)p[7].X, (int)p[7].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
 
-            //for (int i = 0; i < colorArray.Length; i += bytesPerPixel)
-            //{
-            //    colorArray[i] = 255;
-            //    colorArray[i + 1] = 0;
-            //    colorArray[i + 2] = 0;
-            //    colorArray[i + 3] = 255;
 
-            //}
 
         }
     }

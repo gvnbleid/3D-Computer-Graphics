@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using _3D_Computer_Graphics.Geometry;
+using System.Text.RegularExpressions;
 
 namespace _3D_Computer_Graphics
 {
@@ -37,7 +38,7 @@ namespace _3D_Computer_Graphics
             InitializeComponent();
 
             Shapes = new IGeometry[] { new Cuboid() };
-            Camera = new Scene.Camera();
+            Camera = new Scene.Camera(0,0,-100);
             objects = new List<ObjectListElement>();
             //objects.Add(Camera);
             //objectList.ItemsSource = objects;
@@ -51,5 +52,37 @@ namespace _3D_Computer_Graphics
             wb.WritePixels(rect, colorArray, stride, 0);
             Screen.Source = wb;
         }
+
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9-]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        public void NumericUpDown_OnValueChanged(Decimal newValue)
+        {
+            Camera = new Scene.Camera((double)NumericUpDownX.Value, (double)NumericUpDownY.Value, (double)NumericUpDownZ.Value);
+            colorArray = new byte[arraySize];
+            foreach (IGeometry s in Shapes)
+                s.Draw(ref colorArray, Camera.View, 400, 400, stride, bytesPerPixel);
+
+            wb.WritePixels(rect, colorArray, stride, 0);
+            Screen.Source = wb;
+        }
+
+        //private void Camera_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    bool ifX = int.TryParse(CameraXAxis.Text, out int x);
+        //    bool ifY = int.TryParse(CameraYAxis.Text, out int y);
+        //    bool ifZ = int.TryParse(CameraZAxis.Text, out int z);
+        //    if (ifX && ifY && ifZ)
+        //        Camera = new Scene.Camera(x, y, z);
+        //    colorArray = new byte[arraySize];
+        //    foreach (IGeometry s in Shapes)
+        //        s.Draw(ref colorArray, Camera.View, 400, 400, stride, bytesPerPixel);
+
+        //    wb.WritePixels(rect, colorArray, stride, 0);
+        //    Screen.Source = wb;
+        //}
     }
 }

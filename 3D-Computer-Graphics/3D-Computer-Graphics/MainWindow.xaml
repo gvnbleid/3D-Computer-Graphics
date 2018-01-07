@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_3D_Computer_Graphics"
+        xmlns:MyNamespace="clr-namespace:CustomControls;assembly=CustomControls"
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="1000">
     <Grid>
@@ -33,7 +34,21 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Background="LightGray">
-                
+                <StackPanel Orientation="Horizontal">
+                    <Label>X:</Label>
+                    <!--<TextBox Name="CameraXAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
+                    <MyNamespace:NumericUpDown Name="NumericUpDownX" Value="0" OnValChanged="NumericUpDown_OnValueChanged"></MyNamespace:NumericUpDown>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Y:</Label>
+                    <!--<TextBox Name="CameraYAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
+                    <MyNamespace:NumericUpDown Name="NumericUpDownY" Value="0" OnValChanged="NumericUpDown_OnValueChanged"></MyNamespace:NumericUpDown>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Z:</Label>
+                    <!--<TextBox Name="CameraZAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
+                    <MyNamespace:NumericUpDown Name="NumericUpDownZ" Value="0" OnValChanged="NumericUpDown_OnValueChanged"></MyNamespace:NumericUpDown>
+                </StackPanel>
             </StackPanel>
 
             <StackPanel Grid.Row="1" Background="Beige">
