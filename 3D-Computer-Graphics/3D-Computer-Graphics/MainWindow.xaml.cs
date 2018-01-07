@@ -23,8 +23,9 @@ namespace _3D_Computer_Graphics
     {
         private IGeometry[] Shapes;
         private Scene.Camera Camera;
+        private List<ObjectListElement> objects;
 
-        private static WriteableBitmap wb = new WriteableBitmap(400, 200, 96, 96, PixelFormats.Bgra32, null);
+        private static WriteableBitmap wb = new WriteableBitmap(400, 400, 96, 96, PixelFormats.Bgra32, null);
         private static Int32Rect rect = new Int32Rect(0, 0, wb.PixelWidth, wb.PixelHeight);
         private static int bytesPerPixel = (wb.Format.BitsPerPixel + 7) / 8;
         private static int stride = wb.PixelWidth * bytesPerPixel;
@@ -33,21 +34,20 @@ namespace _3D_Computer_Graphics
 
         public MainWindow()
         {
-            Shapes = new IGeometry[] { new Cuboid() };
-            Camera = new Scene.Camera();
             InitializeComponent();
 
-            Random value = new Random();
-            value.NextBytes(colorArray);
+            Shapes = new IGeometry[] { new Cuboid() };
+            Camera = new Scene.Camera();
+            objects = new List<ObjectListElement>();
+            //objects.Add(Camera);
+            //objectList.ItemsSource = objects;
+
+
+            //Random value = new Random();
+            //value.NextBytes(colorArray);
             foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, Camera.View, 400, 200, stride, bytesPerPixel);
-            for (int i = 0; i < colorArray.Length; i++)
-            {
-                if (i % 4 == 0)
-                    colorArray[i] = 255;
-                else
-                    colorArray[i] = 0;
-            }
+                s.Draw(ref colorArray, Camera.View, 400, 400, stride, bytesPerPixel);
+
             wb.WritePixels(rect, colorArray, stride, 0);
             Screen.Source = wb;
         }

@@ -54,6 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ObjectListElement.cs" />
     <Compile Include="Scene\Camera.cs" />
     <Compile Include="Vector.cs" />
     <Page Include="MainWindow.xaml">

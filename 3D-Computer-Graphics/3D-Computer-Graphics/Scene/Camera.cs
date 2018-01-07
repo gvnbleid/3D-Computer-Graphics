@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace _3D_Computer_Graphics.Scene
 {
-    public class Camera
+    public class Camera : ObjectListElement
     {
+        public static int Counter { get; set; } = -1;
         public Vector Position { get; set; }
         public Vector Target { get; set; }
         public Vector Direction { get; set; }
@@ -18,12 +19,15 @@ namespace _3D_Computer_Graphics.Scene
 
         public Camera()
         {
-            Position = new Vector(3, new double[] { 0, 0, 100 });
+            Counter++;
+            Title = "Camera " + Counter;
+            Position = new Vector(3, new double[] { 0, -100, -100});
             Target = new Vector(3, new double[] { 0, 0, 0 });
             Direction = Position - Target;
             Direction.Normalize();
             UpWorld = new Vector(3, 0, 1, 0);
             Right = Vector.CrossProduct(UpWorld, Direction);
+            Right.Normalize();
             Up = Vector.CrossProduct(Direction, Right);
             Matrix tmp1 = new Matrix(4, 4, Right.X, Right.Y, Right.Z, 0,
                 Up.X, Up.Y, Up.Z, 0,

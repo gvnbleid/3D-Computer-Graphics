@@ -32,14 +32,18 @@ namespace _3D_Computer_Graphics.Geometry
         }
 
         public void Draw(ref byte[] colorArray, Matrix view, int width, int height, int stride, int bytesPerPixel)
-        { 
-            double scale = 1 / Math.Tan(45 * 0.5 * Math.PI / 180);
+        {
+            double fov = Math.PI / 2;
+            double scale = 1 / Math.Tan(fov / 2);
+            double aspect = (double)width / height;
             Matrix MProj = new Matrix(4, 4);
-            MProj[0, 0] = scale;
+            double near = 0.1;
+            double far = 1000;
+            MProj[0, 0] = scale/aspect;
             MProj[1, 1] = scale;
-            MProj[2, 2] = -100 / (100 - 0.1);
-            MProj[3, 2] = -100 * 0.1 / (100 - 0.1);
-            MProj[2, 3] = -1;
+            MProj[2, 2] = -(far + near) / (far - near);
+            MProj[2, 3] = -2 * far * near / (far - near);
+            MProj[3, 2] = -1;
 
             foreach(Vector v in Vertices)
             {
@@ -56,18 +60,19 @@ namespace _3D_Computer_Graphics.Geometry
                 if (vvv[0] < -1 || vvv[0] > 1 || vvv[1] < -1 || vvv[1] > 1) continue;
 
                 int x = Math.Min(width - 1, (int)((vvv[0] + 1) * 0.5 * width));
-                int y = Math.Min(height - 1, (int)(1 - (vvv[1] + 1) * 0.5 * height));
+                int y = Math.Max(Math.Min(height - 1, (int)((vvv[1] + 1) * 0.5 * height)),0);
                 colorArray[y * stride + x * bytesPerPixel] = 255;
+                colorArray[y * stride + x * bytesPerPixel + 3] = 255;
             }
 
-            colorArray[100 * stride + 3 * bytesPerPixel] = 0;
-            colorArray[100 * stride + 3 * bytesPerPixel + 1] = 0;
-            colorArray[100 * stride + 3 * bytesPerPixel + 2] = 0;
-            colorArray[100 * stride + 3 * bytesPerPixel + 3] = 0;
-            colorArray[100 * stride + 4 * bytesPerPixel] = 0;
-            colorArray[100 * stride + 5 * bytesPerPixel] = 0;
-            colorArray[100 * stride + 6 * bytesPerPixel] = 0;
-            colorArray[100 * stride + 7 * bytesPerPixel] = 0;
+            //for (int i = 0; i < colorArray.Length; i += bytesPerPixel)
+            //{
+            //    colorArray[i] = 255;
+            //    colorArray[i + 1] = 0;
+            //    colorArray[i + 2] = 0;
+            //    colorArray[i + 3] = 255;
+
+            //}
 
         }
     }
