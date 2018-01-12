@@ -58,6 +58,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Drawing.cs" />
+    <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="ObjectListElement.cs" />
     <Compile Include="Scene\Camera.cs" />
     <Compile Include="Vector.cs" />

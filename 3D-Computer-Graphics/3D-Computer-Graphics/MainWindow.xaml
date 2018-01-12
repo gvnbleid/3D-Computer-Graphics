@@ -18,9 +18,11 @@
         <StackPanel Background="LightGray">
             <TextBlock TextAlignment="Center" FontWeight="Bold">Objects:</TextBlock>
             <ListBox Name="objectList">
-                <DataTemplate>
-                    <TextBlock Text="{Binding Title}"/>
-                </DataTemplate>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Title}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </StackPanel>
         
@@ -37,17 +39,17 @@
                 <StackPanel Orientation="Horizontal">
                     <Label>X:</Label>
                     <!--<TextBox Name="CameraXAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
-                    <MyNamespace:NumericUpDown Name="NumericUpDownX" Value="0" OnValChanged="NumericUpDown_OnValueChanged"></MyNamespace:NumericUpDown>
+                    <MyNamespace:NumericUpDown Name="NumericUpDownX" Value="0" OnValChanged="NumericUpDown_OnValueChanged" MinValue="-1000"></MyNamespace:NumericUpDown>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label>Y:</Label>
                     <!--<TextBox Name="CameraYAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
-                    <MyNamespace:NumericUpDown Name="NumericUpDownY" Value="0" OnValChanged="NumericUpDown_OnValueChanged"></MyNamespace:NumericUpDown>
+                    <MyNamespace:NumericUpDown Name="NumericUpDownY" Value="0" OnValChanged="NumericUpDown_OnValueChanged" MinValue="-1000"></MyNamespace:NumericUpDown>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label>Z:</Label>
                     <!--<TextBox Name="CameraZAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
-                    <MyNamespace:NumericUpDown Name="NumericUpDownZ" Value="0" OnValChanged="NumericUpDown_OnValueChanged"></MyNamespace:NumericUpDown>
+                    <MyNamespace:NumericUpDown Name="NumericUpDownZ" Value="0" OnValChanged="NumericUpDown_OnValueChanged" MinValue="-1000"></MyNamespace:NumericUpDown>
                 </StackPanel>
             </StackPanel>
 

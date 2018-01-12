@@ -28,7 +28,9 @@ namespace _3D_Computer_Graphics
                 int index = y0 * stride + x0 * bytesPerPixel;
                 if (index >= 0 && index < colorArray.Length)
                 {
-                    colorArray[index] = 255;
+                    colorArray[index] = color.B;
+                    colorArray[index + 1] = color.G;
+                    colorArray[index + 2] = color.R;
                     colorArray[index + 3] = 255;
                 }
                 if (x0 == x1 && y0 == y1) break;

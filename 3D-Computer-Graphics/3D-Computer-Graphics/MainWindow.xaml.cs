@@ -40,8 +40,8 @@ namespace _3D_Computer_Graphics
             Shapes = new IGeometry[] { new Cuboid() };
             Camera = new Scene.Camera(0,0,-100);
             objects = new List<ObjectListElement>();
-            //objects.Add(Camera);
-            //objectList.ItemsSource = objects;
+            objects.Add(Camera);
+            objectList.ItemsSource = objects;
 
 
             //Random value = new Random();

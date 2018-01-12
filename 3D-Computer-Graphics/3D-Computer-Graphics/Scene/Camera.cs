@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace _3D_Computer_Graphics.Scene
 {
     public class Camera : ObjectListElement
-    {
-        public static int Counter { get; set; } = -1;
+    { 
         public Vector Position { get; set; }
         public Vector Target { get; set; }
         public Vector Direction { get; set; }
@@ -39,5 +38,7 @@ namespace _3D_Computer_Graphics.Scene
                 0, 0, 0, 1);
             View = tmp1 * tmp2;
         }
+
+        public Camera() { }
     }
 }
