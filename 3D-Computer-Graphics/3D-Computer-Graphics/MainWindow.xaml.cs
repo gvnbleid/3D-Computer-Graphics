@@ -38,7 +38,7 @@ namespace _3D_Computer_Graphics
             InitializeComponent();
 
             Shapes = new IGeometry[] { new Cuboid() };
-            Camera = new Scene.Camera(0,0,-100);
+            Camera = new Scene.Camera(0,0,-200);
             objects = new List<ObjectListElement>();
             objects.Add(Camera);
             objectList.ItemsSource = objects;

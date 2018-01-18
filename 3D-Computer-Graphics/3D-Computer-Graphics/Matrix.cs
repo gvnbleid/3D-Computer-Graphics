@@ -123,7 +123,7 @@ namespace _3D_Computer_Graphics
                     sum += m[i, j] * v[j];
                 tmp[i] = sum;
             }
-            return new Vector(m.Rows, tmp);
+            return new Vector(tmp);
         }
     }
 

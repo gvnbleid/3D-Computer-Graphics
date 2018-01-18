@@ -20,11 +20,11 @@ namespace _3D_Computer_Graphics.Scene
         {
             Counter++;
             Title = "Camera " + Counter;
-            Position = new Vector(3, new double[] { x, y, z});
-            Target = new Vector(3, new double[] { 0, 0, 0 });
+            Position = new Vector(new double[] { x, y, z});
+            Target = new Vector(new double[] { 0, 0, 0 });
             Direction = Position - Target;
             Direction.Normalize();
-            UpWorld = new Vector(3, 0, 1, 0);
+            UpWorld = new Vector(0, 1, 0);
             Right = Vector.CrossProduct(UpWorld, Direction);
             Right.Normalize();
             Up = Vector.CrossProduct(Direction, Right);

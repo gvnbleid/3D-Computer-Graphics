@@ -23,13 +23,13 @@ namespace _3D_Computer_Graphics.Geometry
         public int Y { get; set; }
         public int Z { get; set; }
         public Vector[] Vertices { get; set; }
-        public Point[] Pixels { get; set; }
+        public Vector[] Pixels { get; set; }
 
         public Cuboid()
         {
             Counter++;
             Title = "Cuboid " + Counter;
-            Position = new Vector(4, 0, 0, 0, 1);
+            Position = new Vector(0, 0, 0, 1);
             X = 100;
             Y = 100;
             Z = 100;
@@ -41,15 +41,15 @@ namespace _3D_Computer_Graphics.Geometry
             //Vertices[3] = new Vector(4, 0, 0, 100, 1);
 
             Vertices = new Vector[8];
-            Vertices[0] = new Vector(4, Position.X - X / 2, Position.Y - Y / 2, Position.Z - Z / 2, 1);
-            Vertices[1] = new Vector(4, Position.X + X / 2, Position.Y - Y / 2, Position.Z - Z / 2, 1);
-            Vertices[2] = new Vector(4, Position.X + X / 2, Position.Y + Y / 2, Position.Z - Z / 2, 1);
-            Vertices[3] = new Vector(4, Position.X - X / 2, Position.Y + Y / 2, Position.Z - Z / 2, 1);
-            Vertices[4] = new Vector(4, Position.X - X / 2, Position.Y + Y / 2, Position.Z + Z / 2, 1);
-            Vertices[5] = new Vector(4, Position.X + X / 2, Position.Y + Y / 2, Position.Z + Z / 2, 1);
-            Vertices[6] = new Vector(4, Position.X + X / 2, Position.Y - Y / 2, Position.Z + Z / 2, 1);
-            Vertices[7] = new Vector(4, Position.X - X / 2, Position.Y - Y / 2, Position.Z + Z / 2, 1);
-            Pixels = new Point[Vertices.Length];
+            Vertices[0] = new Vector(Position.X - X / 2, Position.Y - Y / 2, Position.Z - Z / 2, 1);
+            Vertices[1] = new Vector(Position.X + X / 2, Position.Y - Y / 2, Position.Z - Z / 2, 1);
+            Vertices[2] = new Vector(Position.X + X / 2, Position.Y + Y / 2, Position.Z - Z / 2, 1);
+            Vertices[3] = new Vector(Position.X - X / 2, Position.Y + Y / 2, Position.Z - Z / 2, 1);
+            Vertices[4] = new Vector(Position.X - X / 2, Position.Y + Y / 2, Position.Z + Z / 2, 1);
+            Vertices[5] = new Vector(Position.X + X / 2, Position.Y + Y / 2, Position.Z + Z / 2, 1);
+            Vertices[6] = new Vector(Position.X + X / 2, Position.Y - Y / 2, Position.Z + Z / 2, 1);
+            Vertices[7] = new Vector(Position.X - X / 2, Position.Y - Y / 2, Position.Z + Z / 2, 1);
+            Pixels = new Vector[Vertices.Length];
         }
 
         public void Draw(ref byte[] colorArray, Matrix view, int width, int height, int stride, int bytesPerPixel)
@@ -84,14 +84,19 @@ namespace _3D_Computer_Graphics.Geometry
 
                 int x = Math.Min(width - 1, (int)((vvv[0] + 1) * 0.5 * width));
                 int y = Math.Max(Math.Min(height - 1, (int)((vvv[1] + 1) * 0.5 * height)), 0);
-                Pixels[index++] = new Point(x, y);
-                colorArray[y * stride + x * bytesPerPixel] = 255;
-                colorArray[y * stride + x * bytesPerPixel + 3] = 255;
+                double z = (vvv[2] + 1) * 0.5;
+                Pixels[index++] = new Vector(x, y, z);
             }
             InitTriangles(out Triangle[] triangles);
             foreach (Triangle t in triangles)
-                t.Draw(ref colorArray, view, width, height, stride, bytesPerPixel);
-            Point[] p = Pixels;
+            {
+                if (!t.GetOrientation())
+                {
+                    t.Draw(ref colorArray, stride, bytesPerPixel);
+                    t.Fill(ref colorArray, stride, bytesPerPixel);
+                }
+            }
+            //Point[] p = Pixels;
             //Drawing.DrawLine((int)p[0].X, (int)p[0].Y, (int)p[1].X, (int)p[1].Y, Colors.Blue, ref colorArray, stride, bytesPerPixel);
             //Drawing.DrawLine((int)p[0].X, (int)p[0].Y, (int)p[2].X, (int)p[2].Y, Colors.Blue, ref colorArray, stride, bytesPerPixel);
             //Drawing.DrawLine((int)p[0].X, (int)p[0].Y, (int)p[3].X, (int)p[3].Y, Colors.Blue, ref colorArray, stride, bytesPerPixel);
