@@ -10,7 +10,7 @@ namespace _3D_Computer_Graphics.Geometry
 {
     public class Triangle
     {
-        public Vector[] Vertices;
+        public Vector[] Vertices { get; set; }
 
         public Triangle()
         {
@@ -51,6 +51,35 @@ namespace _3D_Computer_Graphics.Geometry
             if (Vertices.Contains(null))
                 return true;
             return (Vertices[1].Y - Vertices[0].Y) * (Vertices[2].X - Vertices[1].X) - (Vertices[2].Y - Vertices[1].Y) * (Vertices[1].X - Vertices[0].X) > 0;
+        }
+
+        public void MultiplyByViewAndProjectionMatrix(Scene.Camera c)
+        {
+            foreach(Vector v in Vertices)
+            {
+                v.Transform(c.ViewMatrix);
+                v.Transform(c.ProjectionMatrix);
+            }
+        }
+
+        public void TransformToScreenCoordinates(int width, int height)
+        {
+            foreach(Vector v in Vertices)
+            {
+                if(v[3] != 1)
+                {
+                    v[0] /= v[3];
+                    v[1] /= v[3];
+                    v[2] /= v[3];
+                    v[3] /= v[3];
+                }
+
+                if (v[0] < -1 || v[0] > 1 || v[1] < -1 || v[1] > 1) continue;
+
+                int x = Math.Min(width - 1, (int)((v[0] + 1) * 0.5 * width));
+                int y = Math.Max(Math.Min(height - 1, (int)((v[1] + 1) * 0.5 * height)), 0);
+                double z = (v[2] + 1) * 0.5;
+            }
         }
 
         private void sortVerticesAscendingByY(out Vector[] tmp)
@@ -103,5 +132,6 @@ namespace _3D_Computer_Graphics.Geometry
                 curx2 -= invslope2;
             }
         }
+
     }
 }

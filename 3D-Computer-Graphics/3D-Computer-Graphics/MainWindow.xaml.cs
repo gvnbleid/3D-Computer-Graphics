@@ -36,9 +36,11 @@ namespace _3D_Computer_Graphics
         public MainWindow()
         {
             InitializeComponent();
+            //Screen.Measure(new Size(Width, Height));
+            //Screen.Arrange(new Rect(0, 0, Screen.DesiredSize.Width, Screen.DesiredSize.Height));
 
             Shapes = new IGeometry[] { new Cuboid() };
-            Camera = new Scene.Camera(0,0,-200);
+            Camera = new Scene.Camera(new Vector(0,0,-200), new Vector(0,0,0), 0.1, 1000, Math.PI/2, 400, 400);
             objects = new List<ObjectListElement>();
             objects.Add(Camera);
             objectList.ItemsSource = objects;
@@ -47,7 +49,7 @@ namespace _3D_Computer_Graphics
             //Random value = new Random();
             //value.NextBytes(colorArray);
             foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, Camera.View, 400, 400, stride, bytesPerPixel);
+                s.Draw(ref colorArray, Camera, 400, 400, stride, bytesPerPixel);
 
             wb.WritePixels(rect, colorArray, stride, 0);
             Screen.Source = wb;
@@ -61,10 +63,10 @@ namespace _3D_Computer_Graphics
 
         public void NumericUpDown_OnValueChanged(Decimal newValue)
         {
-            Camera = new Scene.Camera((double)NumericUpDownX.Value, (double)NumericUpDownY.Value, (double)NumericUpDownZ.Value);
+            Camera = new Scene.Camera(new Vector((double)NumericUpDownX.Value, (double)NumericUpDownY.Value, (double)NumericUpDownZ.Value), new Vector(0, 0, 0), 0.1, 1000, Math.PI / 2, 400, 400);
             colorArray = new byte[arraySize];
             foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, Camera.View, 400, 400, stride, bytesPerPixel);
+                s.Draw(ref colorArray, Camera, 400, 400, stride, bytesPerPixel);
 
             wb.WritePixels(rect, colorArray, stride, 0);
             Screen.Source = wb;

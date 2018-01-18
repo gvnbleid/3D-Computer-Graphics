@@ -46,6 +46,13 @@ namespace _3D_Computer_Graphics
             Z /= length;
         }
 
+        public void Transform(Matrix m)
+        {
+            Vector tmp = m * this;
+            for (int i = 0; i < tmp.Dim; i++)
+                this.Values[0, i] = tmp.Values[0, i];
+        }
+
         public double this[int i]
         {
             get { return Values[0,i]; }

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace _3D_Computer_Graphics.Geometry
 {
-    interface IGeometry
+    public abstract class Geometry : ObjectListElement
     {
-        void Draw(ref byte[] colorArray, Scene.Camera c, int width, int height, int stride, int bytesPerPixel);
+        protected Vector Position { get; set; }
+        protected List<Triangle> TrianglesGrid { get; set; }
     }
 }
