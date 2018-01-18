@@ -114,5 +114,8 @@
   <ItemGroup>
     <Folder Include="Filling\" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\LightBulb.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

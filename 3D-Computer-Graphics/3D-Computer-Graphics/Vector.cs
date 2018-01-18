@@ -23,6 +23,14 @@ namespace _3D_Computer_Graphics
             Dim = n;
         }
 
+        public Vector(Matrix m)
+        {
+            Dim = m.Cols;
+            Values = new Matrix(1, Dim);
+            for (int i = 0; i < Dim; i++)
+                Values[0, i] = m[0, i];
+        }
+
         public Vector(params double[] values)
         {
             Values = new Matrix(1, values.Length, values);
@@ -46,11 +54,9 @@ namespace _3D_Computer_Graphics
             Z /= length;
         }
 
-        public void Transform(Matrix m)
+        public Vector DeepClone()
         {
-            Vector tmp = m * this;
-            for (int i = 0; i < tmp.Dim; i++)
-                this.Values[0, i] = tmp.Values[0, i];
+            return new Vector(this.Values);
         }
 
         public double this[int i]

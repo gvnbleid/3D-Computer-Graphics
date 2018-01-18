@@ -18,7 +18,7 @@ namespace _3D_Computer_Graphics.Geometry
         }
         public Triangle(Vector p1, Vector p2, Vector p3)
         {
-            Vertices = new Vector[] { p1, p2, p3 };
+            Vertices = new Vector[] { p1.DeepClone(), p2.DeepClone(), p3.DeepClone() };
         }
 
         public void Draw(ref byte[] colorArray, int stride, int bytesPerPixel)
@@ -27,7 +27,7 @@ namespace _3D_Computer_Graphics.Geometry
             // Drawing.DrawLine((int)Vertices[0].X, (int)Vertices[0].Y, (int)Vertices[1].X, (int)Vertices[1].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
 
             for (int i = 0; i < 3; ++i)
-                Drawing.DrawLine((int)Vertices[i].X, (int)Vertices[i].Y, (int)Vertices[(i+1)%3].X, (int)Vertices[(i+1)%3].Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
+                Drawing.DrawLine((int)Vertices[i].X, (int)Vertices[i].Y, 1, (int)Vertices[(i+1)%3].X, (int)Vertices[(i+1)%3].Y, 1, Colors.Black, ref colorArray, stride, bytesPerPixel);
 
         }
 
@@ -40,7 +40,9 @@ namespace _3D_Computer_Graphics.Geometry
                 fillTopFlatTriangle(sorted, ref colorArray, stride, bytesPerPixel);
             else
             {
-                Vector v4 = new Vector((int)(sorted[0].X + ((double)(sorted[1].Y - sorted[0].Y) / (double)(sorted[2].Y - sorted[0].Y)) * (sorted[2].X - sorted[0].X)), sorted[1].Y);
+                double q = (sorted[1].Y - sorted[0].Y) / (sorted[2].Y - sorted[0].Y);
+                Vector v4 = new Vector((int)(sorted[0].X + ((double)(sorted[1].Y - sorted[0].Y) / (double)(sorted[2].Y - sorted[0].Y)) * (sorted[2].X - sorted[0].X)), sorted[1].Y,
+                    sorted[0].Z * (1 - q) + sorted[2].Z * q);
                 fillBottomFlatTriangle(new Vector[] { sorted[0], sorted[1], v4 }, ref colorArray, stride, bytesPerPixel);
                 fillTopFlatTriangle(new Vector[] { sorted[1], v4, sorted[2] }, ref colorArray, stride, bytesPerPixel);
             }
@@ -53,13 +55,17 @@ namespace _3D_Computer_Graphics.Geometry
             return (Vertices[1].Y - Vertices[0].Y) * (Vertices[2].X - Vertices[1].X) - (Vertices[2].Y - Vertices[1].Y) * (Vertices[1].X - Vertices[0].X) > 0;
         }
 
-        public void MultiplyByViewAndProjectionMatrix(Scene.Camera c)
+        public Triangle MultiplyByViewAndProjectionMatrix(Scene.Camera c)
         {
+            Triangle t = new Triangle();
+            int i = 0;
             foreach(Vector v in Vertices)
             {
-                v.Transform(c.ViewMatrix);
-                v.Transform(c.ProjectionMatrix);
+                Vector vv =  c.ViewMatrix * v;
+                vv = c.ProjectionMatrix * vv;
+                t.Vertices[i++] = vv;
             }
+            return t;
         }
 
         public void TransformToScreenCoordinates(int width, int height)
@@ -79,6 +85,9 @@ namespace _3D_Computer_Graphics.Geometry
                 int x = Math.Min(width - 1, (int)((v[0] + 1) * 0.5 * width));
                 int y = Math.Max(Math.Min(height - 1, (int)((v[1] + 1) * 0.5 * height)), 0);
                 double z = (v[2] + 1) * 0.5;
+                v[0] = x;
+                v[1] = y;
+                v[2] = z;
             }
         }
 
@@ -107,9 +116,10 @@ namespace _3D_Computer_Graphics.Geometry
 
             for (int scanlineY = (int)Vertices[0].Y; scanlineY <= Vertices[1].Y; scanlineY++)
             {
-                //drawLine((int)curx1, scanlineY, (int)curx2, scanlineY);
-                //do zastąpienia przez rysowanie pojedynczych pixeli
-                Drawing.DrawLine((int)curx1, scanlineY, (int)curx2, scanlineY, Colors.Blue, ref colorArray, stride, bytesPerPixel);
+                double q = (double)(scanlineY - Vertices[0].Y) / (double)(Vertices[1].Y - Vertices[0].Y);
+                double z1 = Vertices[0].Z * (1 - q) + Vertices[1].Z * q;
+                double z2 = Vertices[0].Z * (1 - q) + Vertices[2].Z * q;
+                Drawing.DrawLine((int)curx1, scanlineY, z1, (int)curx2, scanlineY, z2, Colors.Blue, ref colorArray, stride, bytesPerPixel);
                 curx1 += invslope1;
                 curx2 += invslope2;
             }
@@ -125,9 +135,10 @@ namespace _3D_Computer_Graphics.Geometry
 
             for (int scanlineY = (int)Vertices[2].Y; scanlineY >= Vertices[0].Y; scanlineY--)
             {
-                //drawLine((int)curx1, scanlineY, (int)curx2, scanlineY);
-                //do zastąpienia przez rysowanie pojedynczych pixeli
-                Drawing.DrawLine((int)curx1, scanlineY, (int)curx2, scanlineY, Colors.Blue, ref colorArray, stride, bytesPerPixel);
+                double q = (double)(Vertices[2].Y - scanlineY) / (double)(Vertices[2].Y - Vertices[0].Y);
+                double z1 = Vertices[2].Z * (1 - q) + Vertices[0].Z * q;
+                double z2 = Vertices[2].Z * (1 - q) + Vertices[1].Z * q;
+                Drawing.DrawLine((int)curx1, scanlineY, z1, (int)curx2, scanlineY, z2, Colors.Blue, ref colorArray, stride, bytesPerPixel);
                 curx1 -= invslope1;
                 curx2 -= invslope2;
             }

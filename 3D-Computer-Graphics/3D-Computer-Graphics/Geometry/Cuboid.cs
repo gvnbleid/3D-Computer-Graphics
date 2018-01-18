@@ -47,12 +47,12 @@ namespace _3D_Computer_Graphics.Geometry
         {
             foreach (Triangle t in TrianglesGrid)
             {
-                t.MultiplyByViewAndProjectionMatrix(c);
-                if (!t.GetOrientation())
+                Triangle tt = t.MultiplyByViewAndProjectionMatrix(c);
+                if (!tt.GetOrientation())
                 {
-                    t.TransformToScreenCoordinates(width, height);
-                    t.Draw(ref colorArray, stride, bytesPerPixel);
-                    t.Fill(ref colorArray, stride, bytesPerPixel);
+                    tt.TransformToScreenCoordinates(width, height);
+                    tt.Draw(ref colorArray, stride, bytesPerPixel);
+                    tt.Fill(ref colorArray, stride, bytesPerPixel);
                 }
             }
         }
