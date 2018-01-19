@@ -60,8 +60,10 @@
     <Compile Include="Drawing.cs" />
     <Compile Include="Geometry\Geometry.cs" />
     <Compile Include="Geometry\Triangle.cs" />
+    <Compile Include="Geometry\Vertex.cs" />
     <Compile Include="ObjectListElement.cs" />
     <Compile Include="Scene\Camera.cs" />
+    <Compile Include="Scene\Light.cs" />
     <Compile Include="Vector.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

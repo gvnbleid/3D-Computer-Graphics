@@ -6,18 +6,18 @@
         xmlns:local="clr-namespace:_3D_Computer_Graphics"
         xmlns:MyNamespace="clr-namespace:CustomControls;assembly=CustomControls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="1000">
+        Title="MainWindow" Height="800" Width="1380">
     <Grid>
-        
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="175"/>
             <ColumnDefinition/>
-            <ColumnDefinition Width="175"/>
+            <ColumnDefinition Width="400"/>
         </Grid.ColumnDefinitions>
 
         <StackPanel Background="LightGray">
             <TextBlock TextAlignment="Center" FontWeight="Bold">Objects:</TextBlock>
-            <ListBox Name="objectList">
+            <ListBox Name="objectList" SelectionMode="Single" SelectionChanged="objectList_SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Title}"/>
@@ -25,39 +25,27 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </StackPanel>
-        <Border  Grid.Column="1" Background="Gray">
-            <Image Grid.Column="1" Name="Screen" Margin="5,0,10,0"/>
+        <Border  Grid.Column="1" Background="Black">
+            <Image Grid.Column="1" Name="Screen"/>
         </Border>
 
-        <Image Grid.Column="1" Name="Light" Width="50" Height="50" Margin="487,91,105,328">
+        <Image Grid.Column="1" Name="Light" Width="50" Height="50" Margin="491,62,76,357">
             <Image.Source>
                 <BitmapImage DecodePixelWidth="50" UriSource="/Images/LightBulb.png"/>
             </Image.Source>
         </Image>
 
         <Grid Grid.Column="2">
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition Height="150"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Background="LightGray">
-                <StackPanel Orientation="Horizontal">
-                    <Label>X:</Label>
-                    <!--<TextBox Name="CameraXAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
-                    <MyNamespace:NumericUpDown Name="NumericUpDownX" Value="0" OnValChanged="NumericUpDown_OnValueChanged" MinValue="-1000"></MyNamespace:NumericUpDown>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Y:</Label>
-                    <!--<TextBox Name="CameraYAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
-                    <MyNamespace:NumericUpDown Name="NumericUpDownY" Value="0" OnValChanged="NumericUpDown_OnValueChanged" MinValue="-1000"></MyNamespace:NumericUpDown>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Z:</Label>
-                    <!--<TextBox Name="CameraZAxis" TextChanged="Camera_TextChanged" PreviewTextInput="NumberValidationTextBox" Width="100"></TextBox>-->
-                    <MyNamespace:NumericUpDown Name="NumericUpDownZ" Value="0" OnValChanged="NumericUpDown_OnValueChanged" MinValue="-1000"></MyNamespace:NumericUpDown>
-                </StackPanel>
+            <StackPanel Grid.Row="0" Background="LightGray" Name="panel">
+                <MyNamespace:NumericUpDown Name="positionX" Visibility="Hidden"></MyNamespace:NumericUpDown>
+                <MyNamespace:NumericUpDown Name="positionY" Visibility="Hidden"></MyNamespace:NumericUpDown>
+                <MyNamespace:NumericUpDown Name="positionZ" Visibility="Hidden"></MyNamespace:NumericUpDown>
             </StackPanel>
 
             <StackPanel Grid.Row="1" Background="Beige">
@@ -68,7 +56,7 @@
                 <CheckBox>Backface culling</CheckBox>
                 <CheckBox>World space transformations</CheckBox>
                 <CheckBox>Draw icons</CheckBox>
-                
+
             </StackPanel>
         </Grid>
     </Grid>

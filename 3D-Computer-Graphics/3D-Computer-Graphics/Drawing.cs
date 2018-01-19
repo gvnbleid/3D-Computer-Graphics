@@ -43,5 +43,21 @@ namespace _3D_Computer_Graphics
                 if (e2 < dy) { err += dx; y0 += sy; }
             }
         }
+
+        public static Color MultiplyColor(Color c, double multiplier)
+        {
+            c.R = (byte)Math.Max(0,(c.R * multiplier));
+            c.G = (byte)Math.Max(0, (c.G * multiplier));
+            c.B = (byte)Math.Max(0, (c.B * multiplier));
+            return Color.FromArgb(255, c.R, c.G, c.B);
+        }
+
+        public static Color AddColor(Color c1, Color c2)
+        {
+            c1.R = (byte)Math.Min(255, c1.R + c2.R);
+            c1.G = (byte)Math.Min(255, c1.G + c2.G);
+            c1.B = (byte)Math.Min(255, c1.B + c2.B);
+            return Color.FromArgb(255, c1.R, c1.G, c1.B);
+        }
     }
 }

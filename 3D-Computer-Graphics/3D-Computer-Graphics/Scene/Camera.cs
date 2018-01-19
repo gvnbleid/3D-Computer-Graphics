@@ -4,19 +4,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Computer_Graphics.Scene
+namespace _3D_Computer_Graphics
 {
     public class Camera : ObjectListElement
     { 
         public Matrix ViewMatrix { get; set; }
         public Matrix ProjectionMatrix { get; set; }
+        private static int Counter { get; set; } = -1;
+        public Vector Target { get; set; }
+        public double NearClippingPlane { get; set; }
+        public double FarClippingPlane { get; set; }
+        public double FieldOfView { get; set; }
+        public double Aspect { get; set; }
 
-        public Camera(Vector Position, Vector Target, double nearClippingPlane, double farClippingPlane, double fieldOfView, int width, int height)
+        public Camera(Vector position, Vector target, double nearClippingPlane, double farClippingPlane, double fieldOfView, int width, int height)
         {
-            if (Position.Dim != 3 || Target.Dim != 3)
+            if (position.Dim != 3 || target.Dim != 3)
                 throw new FormatException("Dimension of Position and Target vectors must be 3");
+            Position = position.DeepClone();
+            Target = target.DeepClone();
             Counter++;
             Title = "Camera " + Counter;
+            NearClippingPlane = nearClippingPlane;
+            FarClippingPlane = farClippingPlane;
+            FieldOfView = fieldOfView;
+            Aspect = width / height;
+            CalculateMatrices();
+        }
+
+        public void CalculateMatrices()
+        {
             Vector Direction = Position - Target;
             Direction.Normalize();
             Vector UpWorld = new Vector(0, 1, 0);
@@ -33,14 +50,18 @@ namespace _3D_Computer_Graphics.Scene
                 0, 0, 0, 1);
             ViewMatrix = tmp1 * tmp2;
 
-            double scale = 1 / Math.Tan(fieldOfView / 2);
-            double aspect = (double)width / height;
+            double scale = 1 / Math.Tan(FieldOfView / 2);
             ProjectionMatrix = new Matrix(4, 4);
-            ProjectionMatrix[0, 0] = scale / aspect;
+            ProjectionMatrix[0, 0] = scale / Aspect;
             ProjectionMatrix[1, 1] = scale;
-            ProjectionMatrix[2, 2] = -(farClippingPlane + nearClippingPlane) / (farClippingPlane - nearClippingPlane);
-            ProjectionMatrix[2, 3] = -2 * farClippingPlane * nearClippingPlane / (farClippingPlane - nearClippingPlane);
+            ProjectionMatrix[2, 2] = -(FarClippingPlane + NearClippingPlane) / (FarClippingPlane - NearClippingPlane);
+            ProjectionMatrix[2, 3] = -2 * FarClippingPlane * NearClippingPlane / (FarClippingPlane - NearClippingPlane);
             ProjectionMatrix[3, 2] = -1;
+        }
+
+        public override void Actualize()
+        {
+            CalculateMatrices();
         }
 
         public Camera() { }

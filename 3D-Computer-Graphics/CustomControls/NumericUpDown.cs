@@ -58,11 +58,11 @@ namespace CustomControls
             {
                 SetValue(ValueProperty, value);
                 if (OnValChanged != null)
-                    OnValChanged(value);
+                    OnValChanged(this, value);
             }
         }
 
-        public delegate void ValueChanged(Decimal newValue);
+        public delegate void ValueChanged(Object sender, Decimal newValue);
         public ValueChanged OnValChanged { get; set; }
 
         private static void OnValueChanged(DependencyObject element,
