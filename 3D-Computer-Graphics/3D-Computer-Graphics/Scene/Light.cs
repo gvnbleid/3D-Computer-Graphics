@@ -23,6 +23,7 @@ namespace _3D_Computer_Graphics
             Counter++;
             Title = "Light " + Counter;
             Position = position.DeepClone();
+            Position.Y = -Position.Y;
             LightColor = color;
             Rotation = new Vector(0, 0, 0, 0);
         }

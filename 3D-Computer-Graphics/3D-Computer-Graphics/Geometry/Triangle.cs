@@ -11,6 +11,7 @@ namespace _3D_Computer_Graphics.Geometry
     public class Triangle
     {
         public Vertex[] Vertices { get; set; }
+        public Vector Center { get; set; }
         public Vertex[] VerticesInWorldSpace { get; set; }
         public Vertex[] VerticesInProjectionSpace { get; set; }
 
@@ -23,6 +24,9 @@ namespace _3D_Computer_Graphics.Geometry
         public Triangle(Vector v1, Vector v2, Vector v3, Vector Normal)
         {
             Vertices = new Vertex[] { new Vertex(v1.DeepClone(), Normal), new Vertex(v2.DeepClone(), Normal), new Vertex(v3.DeepClone(), Normal) };
+            Center = new Vector((Vertices[0].Position.X + Vertices[1].Position.X + Vertices[2].Position.X) / 3,
+                (Vertices[0].Position.Y + Vertices[1].Position.Y + Vertices[2].Position.Y) / 3,
+                (Vertices[0].Position.Z + Vertices[1].Position.Z + Vertices[2].Position.Z) / 3, 1);
             VerticesInProjectionSpace = new Vertex[3];
             VerticesInWorldSpace = new Vertex[3];
         }
@@ -45,7 +49,7 @@ namespace _3D_Computer_Graphics.Geometry
             Color newObjectColor = Colors.Gray;
             foreach (Light l in lights)
             {
-                Vector toLight = l.Position - Vertices[0].Position;
+                Vector toLight = l.Position - Center;
                 toLight.Normalize();
                 double d = Vector.DotProduct(toLight, Vertices[0].Normal);
                 Color newLightColor = Drawing.MultiplyColor(l.LightColor, d);
@@ -77,7 +81,7 @@ namespace _3D_Computer_Graphics.Geometry
         public void MultiplyByViewAndProjectionMatrix(Camera c)
         {
             int i = 0;
-            foreach(Vertex v in Vertices)
+            foreach(Vertex v in VerticesInWorldSpace)
             {
                 Vector newPos =  c.ViewMatrix * v.Position;
                 newPos = c.ProjectionMatrix * newPos;
@@ -86,6 +90,12 @@ namespace _3D_Computer_Graphics.Geometry
                 newNorm.Normalize();
                 VerticesInProjectionSpace[i++] = new Vertex(newPos, newNorm);
             }
+        }
+
+        public void TransformToWorld(Matrix m)
+        {
+            for (int i = 0; i < 3; i++)
+                VerticesInWorldSpace[i] = new Vertex(m * Vertices[i].Position, Vertices[i].Normal);
         }
 
         public bool TransformToScreenCoordinates(int width, int height)

@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using _3D_Computer_Graphics.Geometry;
 using System.Text.RegularExpressions;
+using System.Collections.ObjectModel;
 
 namespace _3D_Computer_Graphics
 {
@@ -22,12 +23,12 @@ namespace _3D_Computer_Graphics
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IGeometry[] Shapes;
+        private List<IGeometry> Shapes;
         private Camera selectedCamera;
         private Light MainLight;
         ObjectListElement SelectedElement;
 
-        private List<ObjectListElement> objects;
+        private ObservableCollection<ObjectListElement> objects;
         private List<Light> lights;
 
         private static WriteableBitmap wb = new WriteableBitmap(400, 400, 96, 96, PixelFormats.Bgra32, null);
@@ -42,12 +43,13 @@ namespace _3D_Computer_Graphics
             InitializeComponent();
             //Screen.Measure(new Size(Width, Height));
             //Screen.Arrange(new Rect(0, 0, Screen.DesiredSize.Width, Screen.DesiredSize.Height));
-            Cuboid c = new Cuboid();
-            Shapes = new IGeometry[] { c };
-            Camera cam = new Camera(new Vector(50,0,-200,1), new Vector(-50,0,200,0), 0.1, 1000, Math.PI/2, 400, 400);
+            Cuboid c = new Cuboid(new Vector(0,0,0,1), new Vector(45,0,0,0), 1,1,1);
+            Shapes = new List<IGeometry>();
+            Shapes.Add(c);
+            Camera cam = new Camera(new Vector(2,0,-10,1), new Vector(2,0,10,0), 0.1, 1000, Math.PI/2, 400, 400);
             selectedCamera = cam;
-            MainLight = new Light(new Vector(300, 0, 0, 1), Colors.White);
-            objects = new List<ObjectListElement>();
+            MainLight = new Light(new Vector(30, 0, 0, 1), Colors.White);
+            objects = new ObservableCollection<ObjectListElement>();
             objects.Add(cam);
             objects.Add(MainLight);
             objects.Add(c);
@@ -139,12 +141,19 @@ namespace _3D_Computer_Graphics
         private void objectList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             panel.Children.Clear();
-            SelectedElement = objects.Find(o => o.Title.Equals(((ObjectListElement)objectList.SelectedItem).Title));
+            SelectedElement = objects.First(o => o.Title.Equals(((ObjectListElement)objectList.SelectedItem).Title)); //objects.Find(o => o.Title.Equals(((ObjectListElement)objectList.SelectedItem).Title));
             string objectType = SelectedElement.Title.Split(' ')[0];
             switch (objectType)
             {
                 case "Camera":
                     CreateCameraPanel();
+                    selectedCamera = SelectedElement as Camera;
+                    colorArray = new byte[arraySize];
+                    foreach (IGeometry s in Shapes)
+                        s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
+
+                    wb.WritePixels(rect, colorArray, stride, 0);
+                    Screen.Source = wb;
                     break;
                 case "Light":
                     CreateLightPanel();
@@ -159,17 +168,33 @@ namespace _3D_Computer_Graphics
         private void Camera_Click(object sender, RoutedEventArgs e)
         {
             Camera c = new Camera(selectedCamera);
-            objects.Add(c); 
+            objects.Add(c);
         }
 
         private void Light_Click(object sender, RoutedEventArgs e)
         {
+            Light l = new Light(new Vector(0, 0, 0, 1), Colors.White);
+            objects.Add(l);
+            lights.Add(l);
+            colorArray = new byte[arraySize];
+            foreach (IGeometry s in Shapes)
+                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
 
+            wb.WritePixels(rect, colorArray, stride, 0);
+            Screen.Source = wb;
         }
 
         private void Cuboid_Click(object sender, RoutedEventArgs e)
         {
+            Cuboid c = new Cuboid(new Vector(0, 0, 0, 1), new Vector(0, 0, 0, 0), 5, 5, 5);
+            objects.Add(c);
+            Shapes.Add(c);
+            colorArray = new byte[arraySize];
+            foreach (IGeometry s in Shapes)
+                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
 
+            wb.WritePixels(rect, colorArray, stride, 0);
+            Screen.Source = wb;
         }
 
         private void Cone_Click(object sender, RoutedEventArgs e)

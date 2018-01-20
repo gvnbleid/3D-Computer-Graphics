@@ -60,7 +60,7 @@ namespace _3D_Computer_Graphics
                 Direction.X, Direction.Y, Direction.Z, 0,
                 0, 0, 0, 1);
             Matrix tmp2 = new Matrix(4, 4, 1, 0, 0, -Position.X,
-                0, 1, 0, -Position.Y,
+                0, 1, 0, Position.Y,
                 0, 0, 1, -Position.Z,
                 0, 0, 0, 1);
             ViewMatrix = tmp1 * tmp2;
