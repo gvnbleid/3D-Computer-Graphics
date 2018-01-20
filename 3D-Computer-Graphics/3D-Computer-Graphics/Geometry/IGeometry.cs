@@ -8,6 +8,6 @@ namespace _3D_Computer_Graphics.Geometry
 {
     interface IGeometry
     {
-        void Draw(ref byte[] colorArray, Camera c, int width, int height, int stride, int bytesPerPixel);
+        void Draw(ref byte[] colorArray, Camera c, List<Light> l, int width, int height, int stride, int bytesPerPixel);
     }
 }

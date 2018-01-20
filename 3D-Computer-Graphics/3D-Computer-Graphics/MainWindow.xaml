@@ -24,6 +24,14 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+            <StackPanel.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add camera" Click="Camera_Click"/>
+                    <MenuItem Header="Add light" />
+                    <MenuItem Header="Add cuboid" />
+                    <MenuItem Header="Add cone" />
+                </ContextMenu>
+            </StackPanel.ContextMenu>
         </StackPanel>
         <Border  Grid.Column="1" Background="Black">
             <Image Grid.Column="1" Name="Screen"/>

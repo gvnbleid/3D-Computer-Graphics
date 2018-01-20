@@ -70,8 +70,6 @@ namespace _3D_Computer_Graphics.Geometry
 
         public bool GetOrientation()
         {
-            if (VerticesInProjectionSpace.Contains(null))
-                return true;
             return (VerticesInProjectionSpace[1].Position.Y - VerticesInProjectionSpace[0].Position.Y) * (VerticesInProjectionSpace[2].Position.X - VerticesInProjectionSpace[1].Position.X) - 
                 (VerticesInProjectionSpace[2].Position.Y - VerticesInProjectionSpace[1].Position.Y) * (VerticesInProjectionSpace[1].Position.X - VerticesInProjectionSpace[0].Position.X) > 0;
         }
@@ -90,7 +88,7 @@ namespace _3D_Computer_Graphics.Geometry
             }
         }
 
-        public void TransformToScreenCoordinates(int width, int height)
+        public bool TransformToScreenCoordinates(int width, int height)
         {
             foreach(Vertex v in VerticesInProjectionSpace)
             {
@@ -102,15 +100,17 @@ namespace _3D_Computer_Graphics.Geometry
                     v.Position[3] /= v.Position[3];
                 }
 
-                if (v.Position[0] < -1 || v.Position[0] > 1 || v.Position[1] < -1 || v.Position[1] > 1) continue;
+                if (v.Position[0] < -1 || v.Position[0] > 1 || v.Position[1] < -1 || v.Position[1] > 1)
+                    return false;
 
-                int x = Math.Min(width - 1, (int)((v.Position[0] + 1) * 0.5 * width));
+                int x = Math.Max(0, Math.Min(width-1, (int)((v.Position[0] + 1) * 0.5 * width)));
                 int y = Math.Max(Math.Min(height - 1, (int)((v.Position[1] + 1) * 0.5 * height)), 0);
                 double z = (v.Position[2] + 1) * 0.5;
                 v.Position[0] = x;
                 v.Position[1] = y;
                 v.Position[2] = z;
             }
+            return true;
         }
 
         private void sortVerticesAscendingByY(out Vertex[] tmp)

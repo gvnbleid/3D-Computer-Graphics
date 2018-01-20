@@ -17,18 +17,33 @@ namespace _3D_Computer_Graphics
         public double FieldOfView { get; set; }
         public double Aspect { get; set; }
 
-        public Camera(Vector position, Vector target, double nearClippingPlane, double farClippingPlane, double fieldOfView, int width, int height)
+        public Camera(Vector position, Vector rotation, double nearClippingPlane, double farClippingPlane, double fieldOfView, int width, int height)
         {
-            if (position.Dim != 3 || target.Dim != 3)
-                throw new FormatException("Dimension of Position and Target vectors must be 3");
+            if (position.Dim != 4 || rotation.Dim != 4)
+                throw new FormatException("Dimension of Position and Target vectors must be 4");
             Position = position.DeepClone();
-            Target = target.DeepClone();
+            Rotation = rotation.DeepClone();
+            Target = Position + Rotation;
             Counter++;
             Title = "Camera " + Counter;
             NearClippingPlane = nearClippingPlane;
             FarClippingPlane = farClippingPlane;
             FieldOfView = fieldOfView;
             Aspect = width / height;
+            CalculateMatrices();
+        }
+
+        public Camera(Camera c)
+        {
+            Position = c.Position.DeepClone();
+            Rotation = c.Rotation.DeepClone();
+            Target = Position + Rotation;
+            Counter++;
+            Title = "Camera " + Counter;
+            NearClippingPlane = c.NearClippingPlane;
+            FarClippingPlane = c.FarClippingPlane;
+            FieldOfView = c.FieldOfView;
+            Aspect = c.Aspect;
             CalculateMatrices();
         }
 
@@ -61,6 +76,7 @@ namespace _3D_Computer_Graphics
 
         public override void Actualize()
         {
+            Target = Position + Rotation;
             CalculateMatrices();
         }
 

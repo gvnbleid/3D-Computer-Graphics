@@ -28,6 +28,7 @@ namespace _3D_Computer_Graphics.Geometry
             Counter++;
             Title = "Cuboid " + Counter;
             Position = new Vector(0, 0, 0, 1);
+            Rotation = new Vector(0, 0, 0, 0); 
             Width = 100;
             Height = 100;
             Length = 100;
@@ -45,17 +46,15 @@ namespace _3D_Computer_Graphics.Geometry
             InitTriangles(vertices);
         }
 
-        public void Draw(ref byte[] colorArray, Camera c, int width, int height, int stride, int bytesPerPixel)
+        public void Draw(ref byte[] colorArray, Camera c, List<Light> l, int width, int height, int stride, int bytesPerPixel)
         {
             foreach (Triangle t in TrianglesGrid)
-            {
-                Light l = new Light(new Vector(300,0,0,1), Colors.White);
-                l.Position = new Vector(300, 0, 0, 1);
+            { 
                 t.MultiplyByViewAndProjectionMatrix(c);
                 if (!t.GetOrientation())
                 {
-                    t.TransformToScreenCoordinates(width, height);
-                    t.Fill(ref colorArray, stride, bytesPerPixel, ObjectColor, new List<Light>(new Light[] { l }));
+                    if (t.TransformToScreenCoordinates(width, height))
+                        t.Fill(ref colorArray, stride, bytesPerPixel, ObjectColor, l);
                 }
             }
         }

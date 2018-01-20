@@ -39,7 +39,7 @@ namespace _3D_Computer_Graphics
 
         public static Vector CrossProduct(Vector a, Vector b)
         {
-            if (a.Dim != 3 || b.Dim != 3) throw new MException("Vectors must be 3-dimensional");
+            if (a.Dim < 3 || b.Dim < 3) throw new MException("Vectors must be at least 3-dimensional");
             return new Vector(new double[] { a.Y*b.Z-a.Z*b.Y,
             a.Z*b.X-a.X*b.Z, a.X*b.Y-a.Y*b.X});
         }
@@ -81,6 +81,15 @@ namespace _3D_Computer_Graphics
             double[] tmp = new double[v1.Dim];
             for (int i = 0; i < tmp.Length; i++)
                 tmp[i] = v1[i] - v2[i];
+            return new Vector(tmp);
+        }
+
+        public static Vector operator +(Vector v1, Vector v2)
+        {
+            if (v1.Dim != v2.Dim) throw new MException("Dimensions must be the same");
+            double[] tmp = new double[v1.Dim];
+            for (int i = 0; i < tmp.Length; i++)
+                tmp[i] = v1[i] + v2[i];
             return new Vector(tmp);
         }
 

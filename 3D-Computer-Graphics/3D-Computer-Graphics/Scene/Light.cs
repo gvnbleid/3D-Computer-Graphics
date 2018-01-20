@@ -24,11 +24,11 @@ namespace _3D_Computer_Graphics
             Title = "Light " + Counter;
             Position = position.DeepClone();
             LightColor = color;
+            Rotation = new Vector(0, 0, 0, 0);
         }
 
         public override void Actualize()
         {
-            throw new NotImplementedException();
         }
     }
 }
