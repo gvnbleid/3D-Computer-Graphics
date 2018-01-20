@@ -44,7 +44,7 @@ namespace _3D_Computer_Graphics
             //Screen.Arrange(new Rect(0, 0, Screen.DesiredSize.Width, Screen.DesiredSize.Height));
             Cuboid c = new Cuboid();
             Shapes = new IGeometry[] { c };
-            Camera cam = new Camera(new Vector(0,0,-200,1), new Vector(0,0,200,0), 0.1, 1000, Math.PI/2, 400, 400);
+            Camera cam = new Camera(new Vector(50,0,-200,1), new Vector(-50,0,200,0), 0.1, 1000, Math.PI/2, 400, 400);
             selectedCamera = cam;
             MainLight = new Light(new Vector(300, 0, 0, 1), Colors.White);
             objects = new List<ObjectListElement>();

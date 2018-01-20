@@ -51,9 +51,9 @@ namespace _3D_Computer_Graphics.Geometry
             foreach (Triangle t in TrianglesGrid)
             { 
                 t.MultiplyByViewAndProjectionMatrix(c);
-                if (!t.GetOrientation())
+                if (t.TransformToScreenCoordinates(width, height))
                 {
-                    if (t.TransformToScreenCoordinates(width, height))
+                    if (!t.GetOrientation())
                         t.Fill(ref colorArray, stride, bytesPerPixel, ObjectColor, l);
                 }
             }
