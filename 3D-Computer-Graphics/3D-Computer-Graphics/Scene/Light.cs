@@ -18,6 +18,16 @@ namespace _3D_Computer_Graphics
         public Color LightColor { get; set; }
         private static int Counter { get; set; } = -1;
 
+        public Light()
+        {
+            Counter++;
+            Title = "Light " + Counter;
+            Position = new Vector(0, 0, 0, 1);
+            Position.Y = -Position.Y;
+            LightColor = Colors.White;
+            Rotation = new Vector(0, 0, 0, 0);
+        }
+
         public Light(Vector position, Color color)
         {
             Counter++;

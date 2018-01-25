@@ -20,9 +20,9 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Background='LightGray' Orientation="Horizontal">
-            <Button Width="50" BorderThickness="0" Margin="5,5,0,5" Background='LightGray'>NEW</Button>
-            <Button Width="50" BorderThickness="0" Margin="5,5,0,5" Background='LightGray'>SAVE</Button>
-            <Button Width="50" BorderThickness="0" Margin="5,5,0,5" Background='LightGray'>OPEN</Button>
+            <Button Width="50" BorderThickness="0" Margin="5,5,0,5" Background='LightGray' Click="NewButton_Click">NEW</Button>
+            <Button Width="50" BorderThickness="0" Margin="5,5,0,5" Background='LightGray' Click="SaveButton_Click">SAVE</Button>
+            <Button Width="50" BorderThickness="0" Margin="5,5,0,5" Background='LightGray' Click="OpenButton_Click">OPEN</Button>
         </StackPanel>
 
         <DockPanel Grid.Column="1" Background='LightGray'/>

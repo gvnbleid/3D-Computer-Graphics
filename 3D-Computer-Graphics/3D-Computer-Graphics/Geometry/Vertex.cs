@@ -11,6 +11,8 @@ namespace _3D_Computer_Graphics.Geometry
         public Vector Position { get; set; }
         public Vector Normal { get; set; }
 
+        public Vertex() { }
+
         public Vertex(Vector position, Vector normal)
         {
             if (position.Dim != 4 || normal.Dim != 4)

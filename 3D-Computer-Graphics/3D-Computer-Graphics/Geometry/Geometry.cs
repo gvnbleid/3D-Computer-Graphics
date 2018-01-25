@@ -9,8 +9,8 @@ namespace _3D_Computer_Graphics.Geometry
 {
     public abstract class Geometry : ObjectListElement
     {
-        protected List<Triangle> TrianglesGrid { get; set; }
-        protected Color ObjectColor { get; set; }
+        public List<Triangle> TrianglesGrid { get; set; }
+        public Color ObjectColor { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public int Length { get; set; }

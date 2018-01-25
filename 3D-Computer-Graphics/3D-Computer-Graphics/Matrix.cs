@@ -8,42 +8,55 @@ namespace _3D_Computer_Graphics
 {
     public class Matrix
     {
-        public int Rows { get; }
-        public int Cols { get; }
-        private double[,] mat;
+        public int Rows { get; set; }
+        public int Cols { get; set; }
+        public double[][] mat { get; set; }
+
+        public Matrix()
+        {
+            Rows = 3;
+            Cols = 3;
+            mat = new double[Rows][];
+            for(int i=0;i<Rows;i++)
+                mat[i] = new double[Cols];
+        }
 
         public Matrix(int rows, int cols)
         {
             Rows = rows;
             Cols = cols;
-            mat = new double[rows, cols];
+            mat = new double[Rows][];
+            for (int i = 0; i < Rows; i++)
+                mat[i] = new double[Cols];
         }
 
         public Matrix(int rows, int cols, params double[] elements )
         {
             Rows = rows;
             Cols = cols;
-            mat = new double[rows, cols];
+            mat = new double[Rows][];
+            for (int i = 0; i < Rows; i++)
+                mat[i] = new double[Cols];
             for (int i = 0; i < elements.Length; i++)
-                mat[i / Cols, i % Cols] = elements[i];
+                mat[i / Cols][i % Cols] = elements[i];
         }
 
         public double this[int iRow, int iCol]
         {
-            get { return mat[iRow, iCol]; }
-            set { mat[iRow, iCol] = value; }
+            get { return mat[iRow][iCol]; }
+            set { mat[iRow][iCol] = value; }
         }
 
         public Matrix GetCol(int k)
         {
             Matrix m = new Matrix(Rows, 1);
-            for (int i = 0; i < Rows; i++) m[i, 0] = mat[i, k];
+            for (int i = 0; i < Rows; i++) m[i, 0] = mat[i][k];
             return m;
         }
 
         public void SetCol(Matrix v, int k)
         {
-            for (int i = 0; i < Rows; i++) mat[i, k] = v[i, 0];
+            for (int i = 0; i < Rows; i++) mat[i][k] = v[i, 0];
         }
 
         public Matrix Duplicate()
@@ -51,7 +64,7 @@ namespace _3D_Computer_Graphics
             Matrix matrix = new Matrix(Rows, Cols);
             for (int i = 0; i < Rows; i++)
                 for (int j = 0; j < Cols; j++)
-                    matrix[i, j] = mat[i, j];
+                    matrix[i, j] = mat[i][j];
             return matrix;
         }
 

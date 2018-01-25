@@ -20,6 +20,8 @@ namespace _3D_Computer_Graphics.Geometry
     {
         private static int Counter { get; set; } = -1;
 
+        public Cuboid() { }
+
         public Cuboid(Vector position, Vector rotation, int width, int height, int length)
         {
             Counter++;

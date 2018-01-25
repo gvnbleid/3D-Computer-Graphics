@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace _3D_Computer_Graphics
 {
+    [Serializable]
     public class Camera : ObjectListElement
     { 
         public Matrix ViewMatrix { get; set; }

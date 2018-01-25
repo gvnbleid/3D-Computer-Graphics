@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
+using _3D_Computer_Graphics.Geometry;
 
 namespace _3D_Computer_Graphics
 {
+    [XmlInclude(typeof(Camera))]
+    [XmlInclude(typeof(Light))]
+    [XmlInclude(typeof(Cuboid))]
+    [XmlInclude(typeof(Cone))]
     public abstract class ObjectListElement
     {
         public string Title { get; set; }

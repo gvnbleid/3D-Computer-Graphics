@@ -8,7 +8,7 @@ namespace _3D_Computer_Graphics
 {
     public class Vector
     {
-        public Matrix Values { get; }
+        public Matrix Values { get; set; }
         public int Dim { get; set; }
 
         public Vector()

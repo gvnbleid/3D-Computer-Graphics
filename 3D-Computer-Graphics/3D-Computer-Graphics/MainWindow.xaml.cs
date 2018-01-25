@@ -15,6 +15,9 @@ using System.Windows.Shapes;
 using _3D_Computer_Graphics.Geometry;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace _3D_Computer_Graphics
 {
@@ -23,13 +26,14 @@ namespace _3D_Computer_Graphics
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<IGeometry> Shapes;
+        public List<IGeometry> Shapes;
         private Camera selectedCamera;
         private Light MainLight;
         ObjectListElement SelectedElement;
 
-        private ObservableCollection<ObjectListElement> objects;
-        private List<Light> lights;
+        public ObservableCollection<ObjectListElement> objects;
+        public List<Light> lights;
+        public List<Camera> cameras;
 
         private static WriteableBitmap wb = new WriteableBitmap(400, 400, 96, 96, PixelFormats.Bgra32, null);
         private static Int32Rect rect = new Int32Rect(0, 0, wb.PixelWidth, wb.PixelHeight);
@@ -44,28 +48,32 @@ namespace _3D_Computer_Graphics
             //Screen.Measure(new Size(Width, Height));
             //Screen.Arrange(new Rect(0, 0, Screen.DesiredSize.Width, Screen.DesiredSize.Height));
             //Cuboid c = new Cuboid(new Vector(0,0,0,1), new Vector(0,0,0,0), 1,1,1);
-            //Shapes = new List<IGeometry>();
+            Shapes = new List<IGeometry>();
             //Shapes.Add(c);
-            Camera cam = new Camera(new Vector(0,0,-5,1), new Vector(0,0,0,0), 0.1, 1000, Math.PI/2, 400, 400);
-            selectedCamera = cam;
+            cameras = new List<Camera>();
+            //Camera cam = new Camera(new Vector(0,0,-5,1), new Vector(0,0,0,0), 0.1, 1000, Math.PI/2, 400, 400);
+            //selectedCamera = cam;
+            //cameras.Add(cam);
             MainLight = new Light(new Vector(30, 0, 0, 1), Colors.White);
             objects = new ObservableCollection<ObjectListElement>();
-            objects.Add(cam);
-            objects.Add(MainLight);
+            //objects.Add(cam);
+            //objects.Add(MainLight);
             //objects.Add(c);
             objectList.ItemsSource = objects;
 
             lights = new List<Light>();
-            lights.Add(MainLight);
+            //lights.Add(MainLight);
 
+           
+        }
 
-            //Random value = new Random();
-            //value.NextBytes(colorArray);
-            //foreach (IGeometry s in Shapes)
-            //    s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
+        private void Draw()
+        {
+            foreach (IGeometry s in Shapes)
+                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
 
-            //wb.WritePixels(rect, colorArray, stride, 0);
-            //Screen.Source = wb;
+            wb.WritePixels(rect, colorArray, stride, 0);
+            Screen.Source = wb;
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
@@ -144,6 +152,7 @@ namespace _3D_Computer_Graphics
         {
             Camera c = new Camera(selectedCamera);
             objects.Add(c);
+            cameras.Add(c);
         }
 
         private void Light_Click(object sender, RoutedEventArgs e)
@@ -183,6 +192,114 @@ namespace _3D_Computer_Graphics
 
             wb.WritePixels(rect, colorArray, stride, 0);
             Screen.Source = wb;
+        }
+
+        //
+        //Menu Buttons
+        //
+
+        private void NewButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch(MessageBox.Show("Do you want to save before creating new scene?",
+                "", MessageBoxButton.YesNoCancel))
+            {
+                case MessageBoxResult.Cancel:
+                    return;
+                case MessageBoxResult.Yes:
+                    SaveButton_Click(sender, e);
+                    break;
+            }
+
+            objects.Clear();
+            lights.Clear();
+            Shapes.Clear();
+
+            Camera cam = new Camera(new Vector(0, 0, -5, 1), new Vector(0, 0, 0, 0), 0.1, 1000, Math.PI / 2, 400, 400);
+            selectedCamera = cam;
+            cameras.Add(cam);
+            objects.Add(cam);
+            Light l = new Light(new Vector(30, 0, 0, 1), Colors.White);
+            objects.Add(l);
+            lights.Add(l);
+            Cuboid_Click(sender, e);
+            
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "txt files (*.txt)|*.txt";
+            if (saveFileDialog.ShowDialog() == true)
+                Serialize(saveFileDialog.FileName);
+        }
+
+        private void OpenButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch (MessageBox.Show("Do you want to save current scene?",
+                "", MessageBoxButton.YesNoCancel))
+            {
+                case MessageBoxResult.Cancel:
+                    return;
+                case MessageBoxResult.Yes:
+                    SaveButton_Click(sender, e);
+                    break;
+            }
+
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "txt files (*.txt)|*.txt";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    Stream stream;
+                    if ((stream = openFileDialog.OpenFile()) != null)
+                    {
+                        using (stream)
+                        {
+                            Deserialize(stream);
+                            lights.Clear();
+                            Shapes.Clear();
+                            foreach(ObjectListElement o in objects)
+                            {
+                                if (o is Camera)
+                                    selectedCamera = o as Camera;
+                                else if (o is _3D_Computer_Graphics.Geometry.Geometry)
+                                    Shapes.Add(o as _3D_Computer_Graphics.Geometry.IGeometry);
+                                else if (o is Light)
+                                    lights.Add(o as Light);
+                            }
+                            Draw();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+
+        //
+        //XML Serialization
+        //
+        private void Serialize(string path)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(ObservableCollection<ObjectListElement>));
+            using (TextWriter writer = new StreamWriter(path))
+            {
+                serializer.Serialize(writer, objects);
+            }
+        }
+
+        private void Deserialize(Stream s)
+        {
+            XmlSerializer deserializer = new XmlSerializer(typeof(ObservableCollection<ObjectListElement>));
+            TextReader reader = new StreamReader(s);
+            object obj = deserializer.Deserialize(reader);
+            objects = (ObservableCollection<ObjectListElement>)obj;
+            objectList.ItemsSource = objects;
+            reader.Close();
         }
 
         private Grid CreateBaseGrid()
