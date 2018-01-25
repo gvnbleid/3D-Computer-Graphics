@@ -18,7 +18,7 @@ namespace _3D_Computer_Graphics
 {
     public static class Drawing
     {
-        public static void DrawLine(int x0, int y0, double z0, int x1, int y1, double z1, Color color, ref byte[] colorArray, int stride, int bytesPerPixel)
+        public static void DrawLine(int x0, int y0, double z0, int x1, int y1, double z1, Color color1, Color color2, ref byte[] colorArray, int stride, int bytesPerPixel)
         {
             int width = x1 - x0;
             int begining = x0;
@@ -30,6 +30,9 @@ namespace _3D_Computer_Graphics
                 double q = (double)(x0 - begining) / (double)width;
                 int index = y0 * stride + x0 * bytesPerPixel;
                 double z = z0 * (1 - q) + z1 * q;
+                Color color = Color.FromArgb(255, (byte)(color1.R * (1 - q) + color2.R * q),
+                    (byte)(color1.G * (1 - q) + color2.G * q),
+                    (byte)(color1.B * (1 - q) + color2.B * q));
                 if (index >= 0 && index < colorArray.Length)
                 {
                     colorArray[index] = (byte)Math.Min(255,(int)color.B*z);

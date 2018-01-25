@@ -71,7 +71,9 @@ namespace _3D_Computer_Graphics
         {
             colorArray = new byte[arraySize];
             foreach (GeometryObject s in Shapes)
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel, (bool)drawFacesCheckBox.IsChecked, (bool)backfaceCullingCheckBox.IsChecked);
+            {
+                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel, (bool)drawFacesCheckBox.IsChecked, (bool)backfaceCullingCheckBox.IsChecked, (bool)flatButton.IsChecked);
+            }
 
             wb.WritePixels(rect, colorArray, stride, 0);
             Screen.Source = wb;

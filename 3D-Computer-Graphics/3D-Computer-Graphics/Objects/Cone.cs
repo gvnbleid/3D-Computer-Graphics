@@ -45,7 +45,7 @@ namespace _3D_Computer_Graphics
             Vector center = new Vector(Position.X, Position.Y + 0.5, Position.Z, 1);
             for(int i=0;i<36;i++)
             {
-                Vector tmp = Vector.CrossProduct(vertices[36] - vertices[i], vertices[36] - vertices[i+1]);
+                Vector tmp = Vector.CrossProduct(vertices[36] - vertices[i], vertices[36] - vertices[(i+1)%36]);
                 tmp.Normalize();
                 Vector normal = new Vector(-tmp.X, -tmp.Y, -tmp.Z, 0);
                 TrianglesGrid.Add(new Triangle(vertices[(i+1)%36], vertices[i], center, new Vector(0, 1, 0, 0)));

@@ -75,8 +75,8 @@
                 <CheckBox IsChecked="true" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" Name="drawFacesCheckBox">Draw faces</CheckBox>
                 <CheckBox IsChecked="True" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" Name="backfaceCullingCheckBox">Backface culling</CheckBox>
                 <TextBlock>Type of shading:</TextBlock>
-                <RadioButton Margin="5,0,0,0">Flat shading</RadioButton>
-                <RadioButton Margin="5,0,0,0">Gouraud shading</RadioButton>
+                <RadioButton Margin="5,0,0,0" Name="flatButton" IsChecked="True" Checked="CheckBox_Checked">Flat shading</RadioButton>
+                <RadioButton Margin="5,0,0,0" Name="gouraudButton" Checked="CheckBox_Checked">Gouraud shading</RadioButton>
             </StackPanel>
         </Grid>
     </Grid>
