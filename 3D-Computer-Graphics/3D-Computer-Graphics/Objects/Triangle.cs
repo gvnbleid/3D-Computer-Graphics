@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace _3D_Computer_Graphics.Geometry
+namespace _3D_Computer_Graphics
 {
     public class Triangle
     {
@@ -33,42 +33,71 @@ namespace _3D_Computer_Graphics.Geometry
 
         public void Draw(ref byte[] colorArray, int stride, int bytesPerPixel)
         {
-            // tak było :)
-            // Drawing.DrawLine((int)Vertices[0].Position.X, (int)Vertices[0].Position.Y, (int)Vertices[1].Position.X, (int)Vertices[1].Position.Y, Colors.Black, ref colorArray, stride, bytesPerPixel);
-
             for (int i = 0; i < 3; ++i)
-                Drawing.DrawLine((int)Vertices[i].Position.X, (int)Vertices[i].Position.Y, 1, (int)Vertices[(i+1)%3].Position.X, (int)Vertices[(i+1)%3].Position.Y, 1, Colors.Black, ref colorArray, stride, bytesPerPixel);
+                Drawing.DrawLine((int)VerticesInProjectionSpace[i].Position.X, (int)VerticesInProjectionSpace[i].Position.Y, 1,
+                    (int)VerticesInProjectionSpace[(i+1)%3].Position.X, (int)VerticesInProjectionSpace[(i+1)%3].Position.Y, 1,
+                    Colors.LightBlue, ref colorArray, stride, bytesPerPixel);
 
         }
 
-        public void Fill(ref byte[] colorArray, int stride, int bytesPerPixel, Color c, List<Light> lights)
+        private Color CalculateColorInVertex(Vector vertexPosition, Color c, List<Light> lights, Vector cameraPosition, double shinines)
+        {
+            Color finalColor = Drawing.MultiplyColor(c, Light.AmbientFactor);
+            foreach (Light l in lights)
+            {
+                Color tmp = Colors.Black;
+                Vector toLight = l.Position - vertexPosition;
+                Vector toObserver = cameraPosition - vertexPosition;
+                toLight.Normalize();
+                toObserver.Normalize();
+                double d = Vector.DotProduct(toLight, VerticesInWorldSpace[0].Normal);
+                Vector reflection = VerticesInWorldSpace[0].Normal * 2 * d - toLight;
+                reflection.Normalize();
+                tmp = Drawing.AddColor(tmp, Drawing.MultiplyColor(c, d * l.DiffuseFactor));
+                tmp = Drawing.AddColor(tmp, Drawing.MultiplyColor(l.LightColor, Math.Pow(Vector.DotProduct(reflection, toObserver), shinines) * l.SpecularFactor));
+                double dist = Math.Sqrt(Math.Pow(toLight.X, 2) + Math.Pow(toLight.Y, 2) + Math.Pow(toLight.Z, 2));
+                double attenuation = 1 / (1 + 0.09 * dist + 0.032 * Math.Pow(dist, 2));
+                finalColor = Drawing.AddColor(finalColor, Drawing.MultiplyColor(tmp, attenuation));
+            }
+            return finalColor;
+        }
+
+        public void Fill(ref byte[] colorArray, int stride, int bytesPerPixel, Color c, List<Light> lights, Vector cameraPosition, double shinines)
         {
             //multiplyByWorldMatrix
             //flat model
-            Drawing.MultiplyColor(c, 1);
-            Color newObjectColor = Colors.Gray;
+            Color finalColor = Drawing.MultiplyColor(c, Light.AmbientFactor);
             foreach (Light l in lights)
             {
+                Color tmp = Colors.Black;
                 Vector toLight = l.Position - Center;
+                Vector toObserver = cameraPosition - Center;
                 toLight.Normalize();
-                double d = Vector.DotProduct(toLight, Vertices[0].Normal);
-                Color newLightColor = Drawing.MultiplyColor(l.LightColor, d);
-                newObjectColor = Drawing.AddColor(c, newLightColor);
+                toObserver.Normalize();
+                double d = Vector.DotProduct(toLight, VerticesInWorldSpace[0].Normal);
+                Vector reflection = VerticesInWorldSpace[0].Normal * 2 * d - toLight;
+                reflection.Normalize();
+                tmp = Drawing.AddColor(tmp, Drawing.MultiplyColor(c, d * l.DiffuseFactor));
+                tmp = Drawing.AddColor(tmp, Drawing.MultiplyColor(l.LightColor, Math.Pow(Vector.DotProduct(reflection, toObserver), shinines) * l.SpecularFactor));
+                double dist = Math.Sqrt(Math.Pow(toLight.X, 2) + Math.Pow(toLight.Y, 2) + Math.Pow(toLight.Z, 2));
+                double attenuation = 1 / (1 + 0.09 * dist + 0.032 * Math.Pow(dist, 2));
+                finalColor = Drawing.AddColor(finalColor, Drawing.MultiplyColor(tmp, attenuation));
             }
+
 
             sortVerticesAscendingByY(out Vertex[] sorted);
             if (sorted[1].Position.Y == sorted[2].Position.Y)
-                fillBottomFlatTriangle(sorted, ref colorArray, stride, bytesPerPixel, newObjectColor);
+                fillBottomFlatTriangle(sorted, ref colorArray, stride, bytesPerPixel, finalColor);
             else if (sorted[0].Position.Y == sorted[1].Position.Y)
-                fillTopFlatTriangle(sorted, ref colorArray, stride, bytesPerPixel, newObjectColor);
+                fillTopFlatTriangle(sorted, ref colorArray, stride, bytesPerPixel, finalColor);
             else
             {
                 double q = (sorted[1].Position.Y - sorted[0].Position.Y) / (sorted[2].Position.Y - sorted[0].Position.Y);
                 Vector newPos = new Vector((int)(sorted[0].Position.X + ((double)(sorted[1].Position.Y - sorted[0].Position.Y) / (double)(sorted[2].Position.Y - sorted[0].Position.Y)) * (sorted[2].Position.X - sorted[0].Position.X)), sorted[1].Position.Y,
                     sorted[0].Position.Z * (1 - q) + sorted[2].Position.Z * q, 1);
                 Vertex v4 = new Vertex(newPos, sorted[0].Normal);
-                fillBottomFlatTriangle(new Vertex[] { sorted[0], sorted[1], v4 }, ref colorArray, stride, bytesPerPixel, newObjectColor);
-                fillTopFlatTriangle(new Vertex[] { sorted[1], v4, sorted[2] }, ref colorArray, stride, bytesPerPixel, newObjectColor);
+                fillBottomFlatTriangle(new Vertex[] { sorted[0], sorted[1], v4 }, ref colorArray, stride, bytesPerPixel, finalColor);
+                fillTopFlatTriangle(new Vertex[] { sorted[1], v4, sorted[2] }, ref colorArray, stride, bytesPerPixel, finalColor);
             }
         }
 
@@ -95,7 +124,10 @@ namespace _3D_Computer_Graphics.Geometry
         public void TransformToWorld(Matrix m)
         {
             for (int i = 0; i < 3; i++)
-                VerticesInWorldSpace[i] = new Vertex(m * Vertices[i].Position, Vertices[i].Normal);
+                VerticesInWorldSpace[i] = new Vertex(m * Vertices[i].Position, m * Vertices[i].Normal);
+            Center = new Vector((VerticesInWorldSpace[0].Position.X + VerticesInWorldSpace[1].Position.X + VerticesInWorldSpace[2].Position.X) / 3,
+                (VerticesInWorldSpace[0].Position.Y + VerticesInWorldSpace[1].Position.Y + VerticesInWorldSpace[2].Position.Y) / 3,
+                (VerticesInWorldSpace[0].Position.Z + VerticesInWorldSpace[1].Position.Z + VerticesInWorldSpace[2].Position.Z) / 3, 1);
         }
 
         public bool TransformToScreenCoordinates(int width, int height)

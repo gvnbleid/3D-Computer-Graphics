@@ -26,7 +26,7 @@ namespace _3D_Computer_Graphics
     /// </summary>
     public partial class MainWindow : Window
     {
-        public List<IGeometry> Shapes;
+        public List<GeometryObject> Shapes;
         private Camera selectedCamera;
         private Light MainLight;
         ObjectListElement SelectedElement;
@@ -44,11 +44,11 @@ namespace _3D_Computer_Graphics
 
         public MainWindow()
         {
+            Shapes = new List<GeometryObject>();
             InitializeComponent();
             //Screen.Measure(new Size(Width, Height));
             //Screen.Arrange(new Rect(0, 0, Screen.DesiredSize.Width, Screen.DesiredSize.Height));
             //Cuboid c = new Cuboid(new Vector(0,0,0,1), new Vector(0,0,0,0), 1,1,1);
-            Shapes = new List<IGeometry>();
             //Shapes.Add(c);
             cameras = new List<Camera>();
             //Camera cam = new Camera(new Vector(0,0,-5,1), new Vector(0,0,0,0), 0.1, 1000, Math.PI/2, 400, 400);
@@ -69,18 +69,19 @@ namespace _3D_Computer_Graphics
 
         private void Draw()
         {
-            foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
+            colorArray = new byte[arraySize];
+            foreach (GeometryObject s in Shapes)
+                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel, (bool)drawFacesCheckBox.IsChecked, (bool)backfaceCullingCheckBox.IsChecked);
 
             wb.WritePixels(rect, colorArray, stride, 0);
             Screen.Source = wb;
         }
 
-        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            Regex regex = new Regex("[^0-9-]+");
-            e.Handled = regex.IsMatch(e.Text);
+            Draw();
         }
+
 
         private void Tbx1_TextChanged(object sender, TextChangedEventArgs e)
        {
@@ -111,14 +112,21 @@ namespace _3D_Computer_Graphics
                     if (double.TryParse(tb.Text, out res))
                         SelectedElement.Rotation.Z = res;
                     break;
+                case "scaleX":
+                    if (double.TryParse(tb.Text, out res))
+                        SelectedElement.Width = res;
+                    break;
+                case "scaleY":
+                    if (double.TryParse(tb.Text, out res))
+                        SelectedElement.Height = res;
+                    break;
+                case "scaleZ":
+                    if (double.TryParse(tb.Text, out res))
+                        SelectedElement.Length = res;
+                    break;
             }
             SelectedElement.Actualize();
-            colorArray = new byte[arraySize];
-            foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
-
-            wb.WritePixels(rect, colorArray, stride, 0);
-            Screen.Source = wb;
+            Draw();
         }
 
         private void objectList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -132,11 +140,7 @@ namespace _3D_Computer_Graphics
                     CreateCameraPanel();
                     selectedCamera = SelectedElement as Camera;
                     colorArray = new byte[arraySize];
-                    foreach (IGeometry s in Shapes)
-                        s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
-
-                    wb.WritePixels(rect, colorArray, stride, 0);
-                    Screen.Source = wb;
+                    Draw();
                     break;
                 case "Light":
                     CreateLightPanel();
@@ -144,7 +148,9 @@ namespace _3D_Computer_Graphics
                 case "Cuboid":
                     CreateCuboidPanel();
                     break;
-
+                case "Cone":
+                    CreateConePanel();
+                    break;
             }
         }
 
@@ -161,11 +167,7 @@ namespace _3D_Computer_Graphics
             objects.Add(l);
             lights.Add(l);
             colorArray = new byte[arraySize];
-            foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
-
-            wb.WritePixels(rect, colorArray, stride, 0);
-            Screen.Source = wb;
+            Draw();
         }
 
         private void Cuboid_Click(object sender, RoutedEventArgs e)
@@ -174,11 +176,7 @@ namespace _3D_Computer_Graphics
             objects.Add(c);
             Shapes.Add(c);
             colorArray = new byte[arraySize];
-            foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
-
-            wb.WritePixels(rect, colorArray, stride, 0);
-            Screen.Source = wb;
+            Draw();
         }
 
         private void Cone_Click(object sender, RoutedEventArgs e)
@@ -187,11 +185,7 @@ namespace _3D_Computer_Graphics
             objects.Add(c);
             Shapes.Add(c);
             colorArray = new byte[arraySize];
-            foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
-
-            wb.WritePixels(rect, colorArray, stride, 0);
-            Screen.Source = wb;
+            Draw();
         }
 
         //
@@ -264,8 +258,8 @@ namespace _3D_Computer_Graphics
                             {
                                 if (o is Camera)
                                     selectedCamera = o as Camera;
-                                else if (o is _3D_Computer_Graphics.Geometry.Geometry)
-                                    Shapes.Add(o as _3D_Computer_Graphics.Geometry.IGeometry);
+                                else if (o is GeometryObject)
+                                    Shapes.Add(o as GeometryObject);
                                 else if (o is Light)
                                     lights.Add(o as Light);
                             }
@@ -319,7 +313,7 @@ namespace _3D_Computer_Graphics
             TextBlock tb5 = new TextBlock();
             tb5.Text = "Z";
             Grid.SetRow(tb5, 0);
-            Grid.SetColumn(tb5, 4);
+            Grid.SetColumn(tb5, 5);
             TextBlock tb6 = new TextBlock();
             tb6.Text = "Rotation";
             Grid.SetRow(tb6, 1);
@@ -438,11 +432,9 @@ namespace _3D_Computer_Graphics
             panel.Children.Add(g);
         }
 
-        private void CreateCuboidPanel()
+        private Grid CreateGeometryPanel()
         {
-            TextBlock tb1 = new TextBlock();
-            tb1.Text = "Cuboid";
-            tb1.Background = Brushes.LightBlue;
+           
             Grid g = CreateBaseGrid();
             RowDefinition gridRow = new RowDefinition();
             g.RowDefinitions.Add(gridRow);
@@ -464,38 +456,55 @@ namespace _3D_Computer_Graphics
             Grid.SetRow(tb9, 2);
             Grid.SetColumn(tb9, 5);
 
-            TextBox tbx4 = new TextBox();
-            tbx4.Name = "rotationX";
-            tbx4.Text = "" + SelectedElement.Rotation.X;
-            Grid.SetRow(tbx4, 1);
-            Grid.SetColumn(tbx4, 2);
-            tbx4.TextChanged += Tbx1_TextChanged;
+            TextBox tbx1 = new TextBox();
+            tbx1.Name = "scaleX";
+            tbx1.Text = "" + SelectedElement.Width;
+            Grid.SetRow(tbx1, 2);
+            Grid.SetColumn(tbx1, 2);
+            tbx1.TextChanged += Tbx1_TextChanged;
 
-            TextBox tbx5 = new TextBox();
-            tbx5.Name = "rotationY";
-            tbx5.Text = "" + SelectedElement.Rotation.Y;
-            Grid.SetRow(tbx5, 1);
-            Grid.SetColumn(tbx5, 4);
-            tbx5.TextChanged += Tbx1_TextChanged;
+            TextBox tbx2 = new TextBox();
+            tbx2.Name = "scaleY";
+            tbx2.Text = "" + SelectedElement.Height;
+            Grid.SetRow(tbx2, 2);
+            Grid.SetColumn(tbx2, 4);
+            tbx2.TextChanged += Tbx1_TextChanged;
 
-            TextBox tbx6 = new TextBox();
-            tbx6.Name = "rotationZ";
-            tbx6.Text = "" + SelectedElement.Rotation.Z;
-            Grid.SetRow(tbx6, 1);
-            Grid.SetColumn(tbx6, 6);
-            tbx6.TextChanged += Tbx1_TextChanged;
+            TextBox tbx3 = new TextBox();
+            tbx3.Name = "scaleZ";
+            tbx3.Text = "" + SelectedElement.Length;
+            Grid.SetRow(tbx3, 2);
+            Grid.SetColumn(tbx3, 6);
+            tbx3.TextChanged += Tbx1_TextChanged;
 
             g.Children.Add(tb6);
             g.Children.Add(tb7);
             g.Children.Add(tb8);
             g.Children.Add(tb9);
-            g.Children.Add(tbx4);
-            g.Children.Add(tbx5);
-            g.Children.Add(tbx6);
+            g.Children.Add(tbx1);
+            g.Children.Add(tbx2);
+            g.Children.Add(tbx3);
+            return g;
+        }
+
+        private void CreateCuboidPanel()
+        {
+            TextBlock tb1 = new TextBlock();
+            tb1.Text = "Cuboid";
+            tb1.Background = Brushes.LightBlue;
+            Grid g = CreateGeometryPanel();
             panel.Children.Add(tb1);
             panel.Children.Add(g);
         }
 
-        
+        private void CreateConePanel()
+        {
+            TextBlock tb1 = new TextBlock();
+            tb1.Text = "Cone";
+            tb1.Background = Brushes.LightBlue;
+            Grid g = CreateGeometryPanel();
+            panel.Children.Add(tb1);
+            panel.Children.Add(g);
+        }
     }
 }

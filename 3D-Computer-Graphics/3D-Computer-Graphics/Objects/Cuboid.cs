@@ -14,9 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using _3D_Computer_Graphics.Geometry;
 
-namespace _3D_Computer_Graphics.Geometry
+namespace _3D_Computer_Graphics
 {
-    public class Cuboid : Geometry, IGeometry
+    public class Cuboid : GeometryObject
     {
         private static int Counter { get; set; } = -1;
 
@@ -34,14 +34,14 @@ namespace _3D_Computer_Graphics.Geometry
             ObjectColor = Colors.Gray;
 
             Vector[] vertices = new Vector[8];
-            vertices[0] = new Vector(Position.X - Width, Position.Y - Height, Position.Z - Length, 1);
-            vertices[1] = new Vector(Position.X + Width, Position.Y - Height, Position.Z - Length, 1);
-            vertices[2] = new Vector(Position.X + Width, Position.Y + Height, Position.Z - Length, 1);
-            vertices[3] = new Vector(Position.X - Width, Position.Y + Height, Position.Z - Length, 1);
-            vertices[4] = new Vector(Position.X - Width, Position.Y + Height, Position.Z + Length, 1);
-            vertices[5] = new Vector(Position.X + Width, Position.Y + Height, Position.Z + Length, 1);
-            vertices[6] = new Vector(Position.X + Width, Position.Y - Height, Position.Z + Length, 1);
-            vertices[7] = new Vector(Position.X - Width, Position.Y - Height, Position.Z + Length, 1);
+            vertices[0] = new Vector(Position.X - 0.5, Position.Y - 0.5, Position.Z - 0.5, 1);
+            vertices[1] = new Vector(Position.X + 0.5, Position.Y - 0.5, Position.Z - 0.5, 1);
+            vertices[2] = new Vector(Position.X + 0.5, Position.Y + 0.5, Position.Z - 0.5, 1);
+            vertices[3] = new Vector(Position.X - 0.5, Position.Y + 0.5, Position.Z - 0.5, 1);
+            vertices[4] = new Vector(Position.X - 0.5, Position.Y + 0.5, Position.Z + 0.5, 1);
+            vertices[5] = new Vector(Position.X + 0.5, Position.Y + 0.5, Position.Z + 0.5, 1);
+            vertices[6] = new Vector(Position.X + 0.5, Position.Y - 0.5, Position.Z + 0.5, 1);
+            vertices[7] = new Vector(Position.X - 0.5, Position.Y - 0.5, Position.Z + 0.5, 1);
             InitTriangles(vertices);
             TransformToWorld();
         }

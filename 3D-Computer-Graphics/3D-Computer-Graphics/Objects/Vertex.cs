@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Computer_Graphics.Geometry
+namespace _3D_Computer_Graphics
 {
     public class Vertex
     {

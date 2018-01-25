@@ -11,7 +11,7 @@ namespace _3D_Computer_Graphics
     {
         public double LightIntensity { get; set; }
         public double LightDistance { get; set; }
-        public double AmbientFactor { get; set; }
+        public static double AmbientFactor { get; set; } = 0.1;
         public double DiffuseFactor { get; set; }
         public double SpecularFactor { get; set; }
         public double SpecularHardness { get; set; }
@@ -36,6 +36,8 @@ namespace _3D_Computer_Graphics
             Position.Y = -Position.Y;
             LightColor = color;
             Rotation = new Vector(0, 0, 0, 0);
+            DiffuseFactor = 0.5;
+            SpecularFactor = 0.5;
         }
 
         public override void Actualize()

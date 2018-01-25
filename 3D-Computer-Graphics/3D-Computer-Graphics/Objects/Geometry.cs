@@ -5,25 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace _3D_Computer_Graphics.Geometry
+namespace _3D_Computer_Graphics
 {
-    public abstract class Geometry : ObjectListElement
+    public abstract class GeometryObject : ObjectListElement
     {
         public List<Triangle> TrianglesGrid { get; set; }
         public Color ObjectColor { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int Length { get; set; }
+        
 
-        public void Draw(ref byte[] colorArray, Camera c, List<Light> l, int width, int height, int stride, int bytesPerPixel)
+        public void Draw(ref byte[] colorArray, Camera c, List<Light> l, int width, int height, int stride, int bytesPerPixel, bool fill, bool backfaceCulling)
         {
             foreach (Triangle t in TrianglesGrid)
             {
                 t.MultiplyByViewAndProjectionMatrix(c);
                 if (t.TransformToScreenCoordinates(width, height))
                 {
-                    if (!t.GetOrientation())
-                        t.Fill(ref colorArray, stride, bytesPerPixel, ObjectColor, l);
+                    if (!t.GetOrientation() || !backfaceCulling)
+                    {
+                        if (fill)
+                            t.Fill(ref colorArray, stride, bytesPerPixel, ObjectColor, l, c.Position, 1);
+                        else
+                            t.Draw(ref colorArray, stride, bytesPerPixel);
+                    }
                 }
             }
         }

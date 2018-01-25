@@ -17,6 +17,9 @@ namespace _3D_Computer_Graphics
         public string Title { get; set; }
         public Vector Position { get; set; }
         public Vector Rotation { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public double Length { get; set; }
         public ObjectListElement() { }
 
         public abstract void Actualize();

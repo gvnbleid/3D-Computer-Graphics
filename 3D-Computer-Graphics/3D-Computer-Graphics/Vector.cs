@@ -92,6 +92,13 @@ namespace _3D_Computer_Graphics
                 tmp[i] = v1[i] + v2[i];
             return new Vector(tmp);
         }
+        public static Vector operator *(Vector v1, double d)
+        {
+            double[] tmp = new double[v1.Dim];
+            for (int i = 0; i < tmp.Length; i++)
+                tmp[i] = v1[i] * d;
+            return new Vector(tmp);
+        }
 
         public double X
         {
