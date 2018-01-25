@@ -43,16 +43,16 @@ namespace _3D_Computer_Graphics
             InitializeComponent();
             //Screen.Measure(new Size(Width, Height));
             //Screen.Arrange(new Rect(0, 0, Screen.DesiredSize.Width, Screen.DesiredSize.Height));
-            Cuboid c = new Cuboid(new Vector(0,0,0,1), new Vector(45,0,0,0), 1,1,1);
-            Shapes = new List<IGeometry>();
-            Shapes.Add(c);
-            Camera cam = new Camera(new Vector(2,0,-10,1), new Vector(2,0,10,0), 0.1, 1000, Math.PI/2, 400, 400);
+            //Cuboid c = new Cuboid(new Vector(0,0,0,1), new Vector(0,0,0,0), 1,1,1);
+            //Shapes = new List<IGeometry>();
+            //Shapes.Add(c);
+            Camera cam = new Camera(new Vector(0,0,-5,1), new Vector(0,0,0,0), 0.1, 1000, Math.PI/2, 400, 400);
             selectedCamera = cam;
             MainLight = new Light(new Vector(30, 0, 0, 1), Colors.White);
             objects = new ObservableCollection<ObjectListElement>();
             objects.Add(cam);
             objects.Add(MainLight);
-            objects.Add(c);
+            //objects.Add(c);
             objectList.ItemsSource = objects;
 
             lights = new List<Light>();
@@ -61,42 +61,17 @@ namespace _3D_Computer_Graphics
 
             //Random value = new Random();
             //value.NextBytes(colorArray);
-            foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
+            //foreach (IGeometry s in Shapes)
+            //    s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
 
-            wb.WritePixels(rect, colorArray, stride, 0);
-            Screen.Source = wb;
+            //wb.WritePixels(rect, colorArray, stride, 0);
+            //Screen.Source = wb;
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9-]+");
             e.Handled = regex.IsMatch(e.Text);
-        }
-
-        public void NumericUpDown_OnValueChanged(Object sender, Decimal newValue)
-        {
-            // Camera = new Camera(new Vector((double)positionX.Value, (double)positionY.Value, (double)positionZ.Value), new Vector(0, 0, 0), 0.1, 1000, Math.PI / 2, 400, 400);
-            CustomControls.NumericUpDown num = sender as CustomControls.NumericUpDown;
-            switch (num.Name)
-            {
-                case "positionX":
-                    SelectedElement.Position.X = (double)newValue;
-                    break;
-                case "positionY":
-                    SelectedElement.Position.Y = (double)newValue;
-                    break;
-                case "positionZ":
-                    SelectedElement.Position.Z = (double)newValue;
-                    break;
-            }
-            SelectedElement.Actualize();
-            colorArray = new byte[arraySize];
-            foreach (IGeometry s in Shapes)
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
-
-            wb.WritePixels(rect, colorArray, stride, 0);
-            Screen.Source = wb;
         }
 
         private void Tbx1_TextChanged(object sender, TextChangedEventArgs e)
@@ -186,7 +161,7 @@ namespace _3D_Computer_Graphics
 
         private void Cuboid_Click(object sender, RoutedEventArgs e)
         {
-            Cuboid c = new Cuboid(new Vector(0, 0, 0, 1), new Vector(0, 0, 0, 0), 5, 5, 5);
+            Cuboid c = new Cuboid(new Vector(0, 0, 0, 1), new Vector(0, 0, 0, 0), 1, 1, 1);
             objects.Add(c);
             Shapes.Add(c);
             colorArray = new byte[arraySize];
@@ -199,7 +174,15 @@ namespace _3D_Computer_Graphics
 
         private void Cone_Click(object sender, RoutedEventArgs e)
         {
+            Cone c = new Cone(new Vector(0, 0, 0, 1), new Vector(0, 0, 0, 0), 1, 2, 1);
+            objects.Add(c);
+            Shapes.Add(c);
+            colorArray = new byte[arraySize];
+            foreach (IGeometry s in Shapes)
+                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel);
 
+            wb.WritePixels(rect, colorArray, stride, 0);
+            Screen.Source = wb;
         }
 
         private Grid CreateBaseGrid()

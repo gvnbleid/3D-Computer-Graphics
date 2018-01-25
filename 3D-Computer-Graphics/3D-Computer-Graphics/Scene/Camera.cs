@@ -11,7 +11,7 @@ namespace _3D_Computer_Graphics
         public Matrix ViewMatrix { get; set; }
         public Matrix ProjectionMatrix { get; set; }
         private static int Counter { get; set; } = -1;
-        public Vector Target { get; set; }
+        public Vector Direction { get; set; }
         public double NearClippingPlane { get; set; }
         public double FarClippingPlane { get; set; }
         public double FieldOfView { get; set; }
@@ -23,7 +23,9 @@ namespace _3D_Computer_Graphics
                 throw new FormatException("Dimension of Position and Target vectors must be 4");
             Position = position.DeepClone();
             Rotation = rotation.DeepClone();
-            Target = Position + Rotation;
+
+            Matrix m = RotationMatrix();
+            Direction = m * new Vector(0, 0, -1, 0);
             Counter++;
             Title = "Camera " + Counter;
             NearClippingPlane = nearClippingPlane;
@@ -37,7 +39,10 @@ namespace _3D_Computer_Graphics
         {
             Position = c.Position.DeepClone();
             Rotation = c.Rotation.DeepClone();
-            Target = Position + Rotation;
+
+            Matrix m = RotationMatrix();
+            Direction = m * new Vector(0, 0, -1, 0);
+
             Counter++;
             Title = "Camera " + Counter;
             NearClippingPlane = c.NearClippingPlane;
@@ -49,7 +54,6 @@ namespace _3D_Computer_Graphics
 
         public void CalculateMatrices()
         {
-            Vector Direction = Position - Target;
             Direction.Normalize();
             Vector UpWorld = new Vector(0, 1, 0);
             Vector Right = Vector.CrossProduct(UpWorld, Direction);
@@ -76,10 +80,34 @@ namespace _3D_Computer_Graphics
 
         public override void Actualize()
         {
-            Target = Position + Rotation;
+            Matrix m = RotationMatrix();
+            Direction = m * new Vector(0, 0, -1, 0);
             CalculateMatrices();
         }
 
         public Camera() { }
+
+        private Matrix RotationMatrix()
+        {
+            double cosX = Math.Cos(Rotation.X / 180 * Math.PI);
+            double sinX = Math.Sin(Rotation.X / 180 * Math.PI);
+            double cosY = Math.Cos(Rotation.Y / 180 * Math.PI);
+            double sinY = Math.Sin(Rotation.Y / 180 * Math.PI);
+            double cosZ = Math.Cos(Rotation.Z / 180 * Math.PI);
+            double sinZ = Math.Sin(Rotation.Z / 180 * Math.PI);
+            Matrix rotationXMatrix = new Matrix(4, 4, 1, 0, 0, 0,
+                0, cosX, -sinX, 0,
+                0, sinX, cosX, 0,
+                0, 0, 0, 1);
+            Matrix rotationYMatrix = new Matrix(4, 4, cosY, 0, sinY, 0,
+                0, 1, 0, 0,
+                -sinY, 0, cosY, 0,
+                0, 0, 0, 1);
+            Matrix rotationZMatrix = new Matrix(4, 4, cosZ, -sinZ, 0, 0,
+                sinZ, cosZ, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1);
+            return rotationZMatrix * rotationYMatrix * rotationXMatrix;
+        }
     }
 }
