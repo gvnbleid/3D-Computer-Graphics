@@ -130,16 +130,18 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock>Near clipping plane</TextBlock>
-                        <TextBlock Grid.Column="1" Text="{Binding ElementName=near,Path=Value}"></TextBlock>
+                        <TextBlock>Ambient factor</TextBlock>
+                        <TextBlock Grid.Column="1" Text="{Binding ElementName=ambient,Path=Value}"></TextBlock>
                         <Slider Name="ambient" Grid.Column="2" Minimum="0.0" Maximum="1.0" ValueChanged="ambient_ValueChanged"></Slider>
-                        <TextBlock Grid.Row="1">Far clipping plane</TextBlock>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=far,Path=Value}"></TextBlock>
+                        <TextBlock Grid.Row="1">Diffuse factor</TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=diffuse,Path=Value}"></TextBlock>
                         <Slider Name="diffuse" Grid.Row="1" Grid.Column="2" Minimum="0.0" Maximum="1.0" ValueChanged="diffuse_ValueChanged"></Slider>
-                        <TextBlock Grid.Row="2">Field of view</TextBlock>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ElementName=fov,Path=Value}"></TextBlock>
-                        <Slider Name="specular" Grid.Row="2" Grid.Column="1" Minimum="0.0" Maximum="1.0" ValueChanged="specular_ValueChanged"></Slider>
+                        <TextBlock Grid.Row="2">Specular factor</TextBlock>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ElementName=specular,Path=Value}"></TextBlock>
+                        <Slider Name="specular" Grid.Row="2" Grid.Column="2" Minimum="0.0" Maximum="1.0" ValueChanged="specular_ValueChanged"></Slider>
                     </Grid>
+                    <xctk:ColorPicker Name="lightColor" SelectedColorChanged="lightColor_SelectedColorChanged">
+                    </xctk:ColorPicker>
                 </StackPanel>
 
             </StackPanel>

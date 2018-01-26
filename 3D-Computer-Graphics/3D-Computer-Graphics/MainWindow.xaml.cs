@@ -48,7 +48,15 @@ namespace _3D_Computer_Graphics
             Shapes = new List<GeometryObject>();
             InitializeComponent();
             Screen.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            cameras = new List<Camera>();
+
+            wb = new WriteableBitmap((int)Screen.DesiredSize.Width, (int)Screen.DesiredSize.Height, 96, 96, PixelFormats.Bgra32, null);
+            rect = new Int32Rect(0, 0, wb.PixelWidth, wb.PixelHeight);
+            bytesPerPixel = (wb.Format.BitsPerPixel + 7) / 8;
+            stride = wb.PixelWidth * bytesPerPixel;
+            arraySize = stride * wb.PixelHeight;
+            colorArray = new byte[arraySize];
+
+        cameras = new List<Camera>();
             MainLight = new Light(new Vector(30, 0, 0, 1), Colors.White);
             objects = new ObservableCollection<ObjectListElement>();
             objectList.ItemsSource = objects;
@@ -62,9 +70,20 @@ namespace _3D_Computer_Graphics
         {
             int start = DateTime.Now.Millisecond;
             colorArray = new byte[arraySize];
+            double[,] zbuffer = new double[(int)wb.Width, (int)wb.Height];
+            for (int i = 0; i < (int)wb.Width; i++)
+                for (int j = 0; j < (int)wb.Height; j++)
+                    zbuffer[i, j] = double.NegativeInfinity;
             foreach (GeometryObject s in Shapes)
             {
-                s.Draw(ref colorArray, selectedCamera, lights, 400, 400, stride, bytesPerPixel, (bool)drawFacesCheckBox.IsChecked, (bool)backfaceCullingCheckBox.IsChecked, (bool)flatButton.IsChecked);
+                s.Draw(ref colorArray, selectedCamera, lights, (int)wb.Width, (int)wb.Height, stride, bytesPerPixel,
+                    (bool)drawFacesCheckBox.IsChecked, (bool)backfaceCullingCheckBox.IsChecked, (bool)flatButton.IsChecked, ref zbuffer);
+                //int count = 0;
+                //for (int i = 0; i < (int)wb.Width; i++)
+                //    for (int j = 0; j < (int)wb.Height; j++)
+                //        if (zbuffer[i, j] != double.NegativeInfinity)
+                //            count++;
+                //        System.Windows.MessageBox.Show(""+count);
             }
 
             wb.WritePixels(rect, colorArray, stride, 0);
@@ -77,7 +96,16 @@ namespace _3D_Computer_Graphics
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            foreach(Camera c in cameras)
+            Screen.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+            wb = new WriteableBitmap((int)Screen.DesiredSize.Width, (int)Screen.DesiredSize.Height, 96, 96, PixelFormats.Bgra32, null);
+            rect = new Int32Rect(0, 0, wb.PixelWidth, wb.PixelHeight);
+            bytesPerPixel = (wb.Format.BitsPerPixel + 7) / 8;
+            stride = wb.PixelWidth * bytesPerPixel;
+            arraySize = stride * wb.PixelHeight;
+            colorArray = new byte[arraySize];
+
+            foreach (Camera c in cameras)
             {
                 c.Aspect = Screen.ActualWidth / Screen.ActualHeight;
                 c.CalculateMatrices();
@@ -217,6 +245,7 @@ namespace _3D_Computer_Graphics
                     SaveButton_Click(sender, e);
                     break;
             }
+            objectList.SelectionChanged -= objectList_SelectionChanged;
 
             objects.Clear();
             lights.Clear();
@@ -230,7 +259,8 @@ namespace _3D_Computer_Graphics
             objects.Add(l);
             lights.Add(l);
             Cuboid_Click(sender, e);
-            
+            objectList.SelectionChanged += objectList_SelectionChanged;
+
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -633,6 +663,13 @@ namespace _3D_Computer_Graphics
                 objectList.SelectionChanged += objectList_SelectionChanged;
                 Draw();
             }
+        }
+
+        private void lightColor_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            if (SelectedElement == null)
+                return;
+            (SelectedElement as Light).LightColor = (Color)lightColor.SelectedColor;
         }
     }
 }

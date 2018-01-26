@@ -31,12 +31,12 @@ namespace _3D_Computer_Graphics
             VerticesInWorldSpace = new Vertex[3];
         }
 
-        public void Draw(ref byte[] colorArray, int stride, int bytesPerPixel)
+        public void Draw(ref byte[] colorArray, int stride, int bytesPerPixel, ref double[,] zbuffer)
         {
             for (int i = 0; i < 3; ++i)
                 Drawing.DrawLine((int)VerticesInProjectionSpace[i].Position.X, (int)VerticesInProjectionSpace[i].Position.Y, 1,
                     (int)VerticesInProjectionSpace[(i+1)%3].Position.X, (int)VerticesInProjectionSpace[(i+1)%3].Position.Y, 1,
-                    Colors.LightBlue, Colors.LightBlue, ref colorArray, stride, bytesPerPixel);
+                    Colors.LightBlue, Colors.LightBlue, ref colorArray, stride, bytesPerPixel, ref zbuffer);
 
         }
 
@@ -62,7 +62,7 @@ namespace _3D_Computer_Graphics
             return finalColor;
         }
 
-        public void Fill(ref byte[] colorArray, int stride, int bytesPerPixel, Color c, List<Light> lights, Vector cameraPosition, double shinines, bool flat)
+        public void Fill(ref byte[] colorArray, int stride, int bytesPerPixel, Color c, List<Light> lights, Vector cameraPosition, double shinines, bool flat, ref double[,] zbuffer)
         {
             //multiplyByWorldMatrix
             //flat model
@@ -86,9 +86,9 @@ namespace _3D_Computer_Graphics
 
             sortVerticesAscendingByY(out Vertex[] sorted);
             if (sorted[1].Position.Y == sorted[2].Position.Y)
-                fillBottomFlatTriangle(sorted, colors, ref colorArray, stride, bytesPerPixel);
+                fillBottomFlatTriangle(sorted, colors, ref colorArray, stride, bytesPerPixel, ref zbuffer);
             else if (sorted[0].Position.Y == sorted[1].Position.Y)
-                fillTopFlatTriangle(sorted, colors, ref colorArray, stride, bytesPerPixel);
+                fillTopFlatTriangle(sorted, colors, ref colorArray, stride, bytesPerPixel, ref zbuffer);
             else
             {
                 double q = (sorted[1].Position.Y - sorted[0].Position.Y) / (sorted[2].Position.Y - sorted[0].Position.Y);
@@ -96,8 +96,8 @@ namespace _3D_Computer_Graphics
                     sorted[0].Position.Z * (1 - q) + sorted[2].Position.Z * q, 1);
                 Vertex v4 = new Vertex(newPos, sorted[0].Normal);
                 v4.VertexColor = Drawing.AddColor(Drawing.MultiplyColor(sorted[0].VertexColor, (1 - q)), Drawing.MultiplyColor(sorted[2].VertexColor, q));
-                fillBottomFlatTriangle(new Vertex[] { sorted[0], sorted[1], v4 }, colors, ref colorArray, stride, bytesPerPixel);
-                fillTopFlatTriangle(new Vertex[] { sorted[1], v4, sorted[2] }, colors, ref colorArray, stride, bytesPerPixel);
+                fillBottomFlatTriangle(new Vertex[] { sorted[0], sorted[1], v4 }, colors, ref colorArray, stride, bytesPerPixel, ref zbuffer);
+                fillTopFlatTriangle(new Vertex[] { sorted[1], v4, sorted[2] }, colors, ref colorArray, stride, bytesPerPixel, ref zbuffer);
             }
         }
 
@@ -173,7 +173,7 @@ namespace _3D_Computer_Graphics
             });
         }
 
-        private void fillBottomFlatTriangle(Vertex[] Vertices, Color[] Colors, ref byte[] colorArray, int stride, int bytesPerPixel)
+        private void fillBottomFlatTriangle(Vertex[] Vertices, Color[] Colors, ref byte[] colorArray, int stride, int bytesPerPixel, ref double[,] zbuffer)
         {
             double invslope1 = (Vertices[1].Position.X - Vertices[0].Position.X) / (Vertices[1].Position.Y - Vertices[0].Position.Y);
             double invslope2 = (Vertices[2].Position.X - Vertices[0].Position.X) / (Vertices[2].Position.Y - Vertices[0].Position.Y);
@@ -193,13 +193,13 @@ namespace _3D_Computer_Graphics
                 Color c2 = Color.FromArgb(255, (byte)(Vertices[0].VertexColor.R * (1 - q) + Vertices[2].VertexColor.R * q),
                     (byte)(Vertices[0].VertexColor.G * (1 - q) + Vertices[2].VertexColor.G * q),
                     (byte)(Vertices[0].VertexColor.B * (1 - q) + Vertices[2].VertexColor.B * q));
-                Drawing.DrawLine((int)curx1, scanlineY, z1, (int)curx2, scanlineY, z2, c1, c2, ref colorArray, stride, bytesPerPixel);
+                Drawing.DrawLine((int)curx1, scanlineY, z1, (int)curx2, scanlineY, z2, c1, c2, ref colorArray, stride, bytesPerPixel, ref zbuffer);
                 curx1 += invslope1;
                 curx2 += invslope2;
             }
         }
 
-        private void fillTopFlatTriangle(Vertex[] Vertices, Color[] Colors, ref byte[] colorArray, int stride, int bytesPerPixel)
+        private void fillTopFlatTriangle(Vertex[] Vertices, Color[] Colors, ref byte[] colorArray, int stride, int bytesPerPixel, ref double[,] zbuffer)
         {
             double invslope1 = (Vertices[2].Position.X - Vertices[0].Position.X) / (Vertices[2].Position.Y - Vertices[0].Position.Y);
             double invslope2 = (Vertices[2].Position.X - Vertices[1].Position.X) / (Vertices[2].Position.Y - Vertices[1].Position.Y);
@@ -221,7 +221,7 @@ namespace _3D_Computer_Graphics
                     (byte)(Vertices[2].VertexColor.G * (1 - q) + Vertices[1].VertexColor.G * q),
                     (byte)(Vertices[2].VertexColor.B * (1 - q) + Vertices[1].VertexColor.B * q));
 
-                Drawing.DrawLine((int)curx1, scanlineY, z1, (int)curx2, scanlineY, z2, c1, c2, ref colorArray, stride, bytesPerPixel);
+                Drawing.DrawLine((int)curx1, scanlineY, z1, (int)curx2, scanlineY, z2, c1, c2, ref colorArray, stride, bytesPerPixel, ref zbuffer);
                 curx1 -= invslope1;
                 curx2 -= invslope2;
             }

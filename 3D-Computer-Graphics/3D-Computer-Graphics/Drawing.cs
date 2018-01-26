@@ -18,16 +18,22 @@ namespace _3D_Computer_Graphics
 {
     public static class Drawing
     {
-        public static void DrawLine(int x0, int y0, double z0, int x1, int y1, double z1, Color color1, Color color2, ref byte[] colorArray, int stride, int bytesPerPixel)
+        public static void DrawLine(int x0, int y0, double z0, int x1, int y1, double z1, Color color1, Color color2, ref byte[] colorArray, int stride, int bytesPerPixel, ref double[,] zbuffer)
         {
-            int width = x1 - x0;
-            int begining = x0;
+            int width = Math.Abs(x1 - x0);
+            int height = Math.Abs(y1 - y0);
+            int beginingX = x0;
+            int beginingY = y0;
             int dx = Math.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
             int dy = Math.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
             int err = (dx > dy ? dx : -dy) / 2, e2;
             for (;;)
             {
-                double q = (double)(x0 - begining) / (double)width;
+                double q;
+                if (width != 0)
+                    q = (double)(Math.Abs(x0 - beginingX)) / (double)width;
+                else
+                    q = (double)(Math.Abs(y0 - beginingY)) / (double)height;
                 int index = y0 * stride + x0 * bytesPerPixel;
                 double z = z0 * (1 - q) + z1 * q;
                 Color color = Color.FromArgb(255, (byte)(color1.R * (1 - q) + color2.R * q),
@@ -35,10 +41,14 @@ namespace _3D_Computer_Graphics
                     (byte)(color1.B * (1 - q) + color2.B * q));
                 if (index >= 0 && index < colorArray.Length)
                 {
-                    colorArray[index] = (byte)Math.Min(255,(int)color.B*z);
-                    colorArray[index + 1] = (byte)Math.Min(255, (int)color.G * z);
-                    colorArray[index + 2] = (byte)Math.Min(255, (int)color.R * z);
-                    colorArray[index + 3] = 255;
+                    if (z > zbuffer[x0, y0])
+                    {
+                        colorArray[index] = (byte)Math.Min(255, (int)color.B);
+                        colorArray[index + 1] = (byte)Math.Min(255, (int)color.G);
+                        colorArray[index + 2] = (byte)Math.Min(255, (int)color.R);
+                        colorArray[index + 3] = 255;
+                        zbuffer[x0, y0] = z;
+                    }
                 }
                 if (x0 == x1 && y0 == y1) break;
                 e2 = err;
