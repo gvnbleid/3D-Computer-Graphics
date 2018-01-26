@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_3D_Computer_Graphics"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="1380">
+        Title="MainWindow" Height="800" Width="1380" SizeChanged="Window_SizeChanged">
     <Grid>
 
         <Grid.RowDefinitions>
@@ -25,19 +26,22 @@
             <Button Width="50" BorderThickness="0" Margin="5,5,0,5" Background='LightGray' Click="OpenButton_Click">OPEN</Button>
         </StackPanel>
 
-        <DockPanel Grid.Column="1" Background='LightGray'/>
+        <StackPanel Grid.Column="1" Background='LightGray'>
+            <Label x:Name="fpsBox"  Width="100" Height="50"/>
+        </StackPanel>
         <DockPanel Grid.Column="2" Background='LightGray'/>
 
         <StackPanel Grid.Row="2" Background="LightGray" Margin="5,0,5,5">
             <Line></Line>
             <TextBlock TextAlignment="Center" FontWeight="Bold">Objects:</TextBlock>
-            <ListBox Name="objectList" SelectionMode="Single" SelectionChanged="objectList_SelectionChanged" Background="LightGray">
+            <ListBox Name="objectList" SelectionMode="Single" SelectionChanged="objectList_SelectionChanged" Background="LightGray" KeyDown="objectList_KeyDown">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Title}"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+
             <StackPanel.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Add camera" Click="Camera_Click"/>
@@ -46,10 +50,17 @@
                     <MenuItem Header="Add cone" Click="Cone_Click"/>
                 </ContextMenu>
             </StackPanel.ContextMenu>
+
         </StackPanel>
-        <Border Grid.Row="2"  Grid.Column="1" Background="Black" Margin="0,0,5,5">
+        
+        <Border Grid.Row="2"  Grid.Column="1" Background="Black">
+            <!--<Border Grid.Row="2"  Grid.Column="1" Background="Black" Margin="0,0,5,5">-->
             <Image Grid.Column="1" Name="Screen"/>
+
+            <!--</Border>-->
         </Border>
+
+
 
         <Image Grid.Column="1" Name="Light" Width="50" Height="50" Margin="491,62,76,357">
             <Image.Source>
@@ -63,9 +74,74 @@
                 <RowDefinition />
                 <RowDefinition Height="150"/>
             </Grid.RowDefinitions>
+            <StackPanel Background="LightGray">
+                <StackPanel Grid.Row="0" Background="LightGray" Name="panel" Margin="0,0,5,5">
 
-            <StackPanel Grid.Row="0" Background="LightGray" Name="panel" Margin="0,0,5,5">
-                
+                </StackPanel>
+                <Grid Visibility="Collapsed" Name="camera">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock>Near clipping plane</TextBlock>
+                    <TextBlock Grid.Column="1" Text="{Binding ElementName=near,Path=Value}"></TextBlock>
+                    <Slider Name="near" Grid.Column="2" Minimum="0.1" Maximum="100" ValueChanged="NearPlane_ValueChanged"></Slider>
+                    <TextBlock Grid.Row="1">Far clipping plane</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=far,Path=Value}"></TextBlock>
+                    <Slider Name="far" Grid.Row="1" Grid.Column="2" Minimum="0.1" Maximum="100" ValueChanged="FarPlane_ValueChanged"></Slider>
+                    <TextBlock Grid.Row="2">Field of view</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ElementName=fov,Path=Value}"></TextBlock>
+                    <Slider Name="fov" Grid.Row="2" Grid.Column="2" Minimum="0" Maximum="90" ValueChanged="FieldOfView_ValueChanged"></Slider>
+                </Grid>
+
+                <Grid Visibility="Collapsed" Name="geometry">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock>Color</TextBlock>
+                    <xctk:ColorPicker Grid.Column="1" Name="ClrPcker_Background" SelectedColorChanged="ClrPcker_Background_SelectedColorChanged">
+                    </xctk:ColorPicker>
+                    <TextBlock Grid.Row="1">Shininess</TextBlock>
+                    <Slider Name="shininess" Grid.Row="1" Grid.Column="1" Minimum="0.0" Maximum="1" ValueChanged="shininess_ValueChanged"></Slider>
+                </Grid>
+
+                <StackPanel Visibility="Collapsed" Name="light">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock>Near clipping plane</TextBlock>
+                        <TextBlock Grid.Column="1" Text="{Binding ElementName=near,Path=Value}"></TextBlock>
+                        <Slider Name="ambient" Grid.Column="2" Minimum="0.0" Maximum="1.0" ValueChanged="ambient_ValueChanged"></Slider>
+                        <TextBlock Grid.Row="1">Far clipping plane</TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=far,Path=Value}"></TextBlock>
+                        <Slider Name="diffuse" Grid.Row="1" Grid.Column="2" Minimum="0.0" Maximum="1.0" ValueChanged="diffuse_ValueChanged"></Slider>
+                        <TextBlock Grid.Row="2">Field of view</TextBlock>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ElementName=fov,Path=Value}"></TextBlock>
+                        <Slider Name="specular" Grid.Row="2" Grid.Column="1" Minimum="0.0" Maximum="1.0" ValueChanged="specular_ValueChanged"></Slider>
+                    </Grid>
+                </StackPanel>
+
             </StackPanel>
 
             <StackPanel Grid.Row="1" Background="Beige" Margin="0,0,5,5">

@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Win32;
 using System.Xml.Serialization;
 using System.IO;
+using Xceed.Wpf.Toolkit;
 
 namespace _3D_Computer_Graphics
 {
@@ -46,21 +47,11 @@ namespace _3D_Computer_Graphics
         {
             Shapes = new List<GeometryObject>();
             InitializeComponent();
-            //Screen.Measure(new Size(Width, Height));
-            //Screen.Arrange(new Rect(0, 0, Screen.DesiredSize.Width, Screen.DesiredSize.Height));
-            //Cuboid c = new Cuboid(new Vector(0,0,0,1), new Vector(0,0,0,0), 1,1,1);
-            //Shapes.Add(c);
+            Screen.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             cameras = new List<Camera>();
-            //Camera cam = new Camera(new Vector(0,0,-5,1), new Vector(0,0,0,0), 0.1, 1000, Math.PI/2, 400, 400);
-            //selectedCamera = cam;
-            //cameras.Add(cam);
             MainLight = new Light(new Vector(30, 0, 0, 1), Colors.White);
             objects = new ObservableCollection<ObjectListElement>();
-            //objects.Add(cam);
-            //objects.Add(MainLight);
-            //objects.Add(c);
             objectList.ItemsSource = objects;
-
             lights = new List<Light>();
             //lights.Add(MainLight);
 
@@ -69,6 +60,7 @@ namespace _3D_Computer_Graphics
 
         private void Draw()
         {
+            int start = DateTime.Now.Millisecond;
             colorArray = new byte[arraySize];
             foreach (GeometryObject s in Shapes)
             {
@@ -77,7 +69,27 @@ namespace _3D_Computer_Graphics
 
             wb.WritePixels(rect, colorArray, stride, 0);
             Screen.Source = wb;
+            int end = DateTime.Now.Millisecond;
+            int delta = (end - start) > 0 ? end - start : start - end;
+            double fps = 60000.0 / delta;
+            fpsBox.Content = fps.ToString("N3") + " fps";
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            foreach(Camera c in cameras)
+            {
+                c.Aspect = Screen.ActualWidth / Screen.ActualHeight;
+                c.CalculateMatrices();
+            }
+        }
+
+        private void ClrPcker_Background_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            (SelectedElement as GeometryObject).ObjectColor = (Color)(sender as ColorPicker).SelectedColor;
+            Draw();
+        }
+
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -86,7 +98,7 @@ namespace _3D_Computer_Graphics
 
 
         private void Tbx1_TextChanged(object sender, TextChangedEventArgs e)
-       {
+        {
             TextBox tb = sender as TextBox;
             switch(tb.Name)
             {
@@ -196,7 +208,7 @@ namespace _3D_Computer_Graphics
 
         private void NewButton_Click(object sender, RoutedEventArgs e)
         {
-            switch(MessageBox.Show("Do you want to save before creating new scene?",
+            switch(System.Windows.MessageBox.Show("Do you want to save before creating new scene?",
                 "", MessageBoxButton.YesNoCancel))
             {
                 case MessageBoxResult.Cancel:
@@ -210,7 +222,7 @@ namespace _3D_Computer_Graphics
             lights.Clear();
             Shapes.Clear();
 
-            Camera cam = new Camera(new Vector(0, 0, -5, 1), new Vector(0, 0, 0, 0), 0.1, 1000, Math.PI / 2, 400, 400);
+            Camera cam = new Camera(new Vector(0, 0, -5, 1), new Vector(0, 0, 0, 0), 0.1, 1000, 90, (int)Screen.DesiredSize.Width, (int)Screen.DesiredSize.Height);
             selectedCamera = cam;
             cameras.Add(cam);
             objects.Add(cam);
@@ -232,7 +244,7 @@ namespace _3D_Computer_Graphics
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
-            switch (MessageBox.Show("Do you want to save current scene?",
+            switch (System.Windows.MessageBox.Show("Do you want to save current scene?",
                 "", MessageBoxButton.YesNoCancel))
             {
                 case MessageBoxResult.Cancel:
@@ -271,7 +283,7 @@ namespace _3D_Computer_Graphics
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                    System.Windows.MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
                 }
             }
         }
@@ -422,6 +434,74 @@ namespace _3D_Computer_Graphics
             Grid g = CreateBaseGrid();
             panel.Children.Add(tb1);
             panel.Children.Add(g);
+            geometry.Visibility = Visibility.Collapsed;
+            camera.Visibility = Visibility.Visible;
+            light.Visibility = Visibility.Collapsed;
+            near.Value = (SelectedElement as Camera).NearClippingPlane;
+            far.Value = (SelectedElement as Camera).FarClippingPlane;
+            fov.Value = (SelectedElement as Camera).FieldOfView;
+        }
+
+        private void FarPlane_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SelectedElement == null)
+                return;
+            (SelectedElement as Camera).FarClippingPlane = (sender as Slider).Value;
+            SelectedElement.Actualize();
+            Draw();
+        }
+
+        private void NearPlane_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SelectedElement == null)
+                return;
+            (SelectedElement as Camera).NearClippingPlane = (sender as Slider).Value;
+            SelectedElement.Actualize();
+            Draw();
+        }
+
+        private void FieldOfView_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SelectedElement == null)
+                return;
+            (SelectedElement as Camera).FieldOfView = (sender as Slider).Value;
+            SelectedElement.Actualize();
+            Draw();
+        }
+
+        private void diffuse_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SelectedElement == null)
+                return;
+            (SelectedElement as _3D_Computer_Graphics.Light).DiffuseFactor = e.NewValue;
+            SelectedElement.Actualize();
+            Draw();
+        }
+
+        private void specular_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SelectedElement == null)
+                return;
+            (SelectedElement as _3D_Computer_Graphics.Light).SpecularFactor = e.NewValue;
+            SelectedElement.Actualize();
+            Draw();
+        }
+
+        private void ambient_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SelectedElement == null)
+                return;
+            _3D_Computer_Graphics.Light.AmbientFactor = e.NewValue;
+            SelectedElement.Actualize();
+            Draw();
+        }
+
+        private void shininess_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SelectedElement == null)
+                return;
+            (SelectedElement as GeometryObject).Shininess = e.NewValue;
+            Draw();
         }
 
         private void CreateLightPanel()
@@ -432,6 +512,12 @@ namespace _3D_Computer_Graphics
             Grid g = CreateBaseGrid();
             panel.Children.Add(tb1);
             panel.Children.Add(g);
+            geometry.Visibility = Visibility.Collapsed;
+            camera.Visibility = Visibility.Collapsed;
+            light.Visibility = Visibility.Visible;
+            ambient.Value = _3D_Computer_Graphics.Light.AmbientFactor;
+            diffuse.Value = (SelectedElement as _3D_Computer_Graphics.Light).DiffuseFactor;
+            specular.Value = (SelectedElement as _3D_Computer_Graphics.Light).SpecularFactor;
         }
 
         private Grid CreateGeometryPanel()
@@ -486,6 +572,13 @@ namespace _3D_Computer_Graphics
             g.Children.Add(tbx1);
             g.Children.Add(tbx2);
             g.Children.Add(tbx3);
+
+            geometry.Visibility = Visibility.Visible;
+            camera.Visibility = Visibility.Collapsed;
+            light.Visibility = Visibility.Collapsed;
+
+            shininess.Value = (SelectedElement as GeometryObject).Shininess;
+
             return g;
         }
 
@@ -507,6 +600,39 @@ namespace _3D_Computer_Graphics
             Grid g = CreateGeometryPanel();
             panel.Children.Add(tb1);
             panel.Children.Add(g);
+        }
+
+        private void objectList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Delete)
+            {
+                ObjectListElement o = SelectedElement;
+                objectList.SelectionChanged -= objectList_SelectionChanged;
+                if(o is Camera)
+                {
+                    if(cameras.Count > 1)
+                    {
+                        cameras.Remove(o as Camera);
+                        objects.Remove(o);
+                        selectedCamera = cameras[0];
+                    }
+                    return;
+                }
+                if(o is Light)
+                {
+                    if(lights.Count > 1)
+                    {
+                        lights.Remove(o as Light);
+                        objects.Remove(o);
+                    }
+                    return;
+                }
+                Shapes.Remove(o as GeometryObject);
+                objects.Remove(o);
+                objectList.ItemsSource = objects;
+                objectList.SelectionChanged += objectList_SelectionChanged;
+                Draw();
+            }
         }
     }
 }

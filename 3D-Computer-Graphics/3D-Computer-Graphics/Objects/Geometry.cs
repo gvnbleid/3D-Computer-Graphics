@@ -11,7 +11,7 @@ namespace _3D_Computer_Graphics
     {
         public List<Triangle> TrianglesGrid { get; set; }
         public Color ObjectColor { get; set; }
-        
+        public double Shininess { get; set; }
 
         public void Draw(ref byte[] colorArray, Camera c, List<Light> l, int width, int height, int stride, int bytesPerPixel, bool fill, bool backfaceCulling, bool flat)
         {
@@ -23,7 +23,7 @@ namespace _3D_Computer_Graphics
                     if (!t.GetOrientation() || !backfaceCulling)
                     {
                         if (fill)
-                            t.Fill(ref colorArray, stride, bytesPerPixel, ObjectColor, l, c.Position, 1, flat);
+                            t.Fill(ref colorArray, stride, bytesPerPixel, ObjectColor, l, c.Position, Shininess, flat);
                         else
                             t.Draw(ref colorArray, stride, bytesPerPixel);
                     }

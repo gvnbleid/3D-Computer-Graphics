@@ -71,7 +71,7 @@ namespace _3D_Computer_Graphics
                 0, 0, 0, 1);
             ViewMatrix = tmp1 * tmp2;
 
-            double scale = 1 / Math.Tan(FieldOfView / 2);
+            double scale = 1 / Math.Tan(FieldOfView * Math.PI / 180.0 / 2);
             ProjectionMatrix = new Matrix(4, 4);
             ProjectionMatrix[0, 0] = scale / Aspect;
             ProjectionMatrix[1, 1] = scale;
